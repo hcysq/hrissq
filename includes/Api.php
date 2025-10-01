@@ -19,7 +19,7 @@ public static function forgot_password(){
   }
 
   $nip = sanitize_text_field($_POST['nip'] ?? '');
-  if (!$nip) wp_send_json(['ok'=>false,'msg'=>'NIP wajib diisi']);
+  if (!$nip) wp_send_json(['ok'=>false,'msg'=>'Akun wajib diisi']);
 
   // cari nama pegawai dari hrissq_users
   global $wpdb;
@@ -28,7 +28,7 @@ public static function forgot_password(){
   $nama = $emp ? $emp->nama : '(NIP tidak terdaftar)';
 
   // rakit pesan
-  $message = "Permintaan reset password HRIS SQ\nNIP: {$nip}\nNama: {$nama}";
+  $message = "Permintaan reset pasword HRIS SQ\nAkun (NIP): {$nip}\nNama: {$nama}";
 
   // panggil StarSender (form-encoded + header apikey)
   $args = [
@@ -56,7 +56,7 @@ public static function forgot_password(){
 
     $res = Auth::login($nip, $pw);
     if ($res['ok']) {
-      $res['redirect'] = site_url('/dashboard');
+      $res['redirect'] = trailingslashit(site_url('/' . HRISSQ_DASHBOARD_SLUG));
     }
     wp_send_json($res);
   }
@@ -120,20 +120,23 @@ public static function forgot_password(){
 
     // Kirim data ke Google Sheet
     $sheet_data = [
-      'user_id'        => intval($me->id),
-      'nip'            => $me->nip,
-      'nama'           => $me->nama,
-      'unit'           => $me->unit,
-      'jabatan'        => $me->jabatan,
-      'nama_pelatihan' => $nama,
-      'tahun'          => $tahun,
-      'pembiayaan'     => $pembiayaan,
-      'kategori'       => $kategori,
-      'file_url'       => $file_url,
-      'timestamp'      => current_time('mysql')
+      'nip'                     => $me->nip,
+      'nama'                    => $me->nama,
+      'jabatan'                 => $me->jabatan,
+      'unit_kerja'              => $me->unit,
+      'nama_pelatihan'          => $nama,
+      'tahun_penyelenggaraan'   => $tahun,
+      'pembiayaan'              => $pembiayaan,
+      'kategori'                => $kategori,
+      'link_sertifikat'         => $file_url,
+      'timestamp'               => current_time('mysql')
     ];
 
-    Trainings::submit_to_sheet($sheet_data);
+    $sheet_result = Trainings::submit_to_sheet($sheet_data);
+
+    if ($sheet_result && empty($sheet_result['ok'])) {
+      wp_send_json(['ok'=>false,'msg'=>$sheet_result['msg'] ?? 'Gagal mengirim data ke Google Sheet.']);
+    }
 
     wp_send_json(['ok'=>true]);
   }
