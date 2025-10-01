@@ -61,7 +61,8 @@
             return;
           }
           // server sudah mengirim res.redirect → pakai itu
-          window.location.href = res.redirect || '/dashboard';
+          const dashSlug = (window.HRISSQ && HRISSQ.dashboardSlug) ? HRISSQ.dashboardSlug : 'dashboard';
+          window.location.href = res.redirect || ('/' + dashSlug.replace(/^\/+/, '') + '/');
         })
         .catch(err => {
           msg.textContent = 'Error: ' + (err && err.message ? err.message : err);
@@ -183,9 +184,69 @@
     resetIdle();
   }
 
+  // --- TRAINING FORM ---
+  function bootTrainingForm() {
+    const form = document.getElementById('hrissq-training-form');
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const msg = form.querySelector('.msg');
+      if (!msg) {
+        const msgEl = document.createElement('div');
+        msgEl.className = 'msg';
+        form.appendChild(msgEl);
+      }
+      const msgEl = form.querySelector('.msg');
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Menyimpan...';
+      msgEl.className = 'msg';
+      msgEl.textContent = '';
+
+      const formData = new FormData(form);
+      formData.append('action', 'hrissq_submit_training');
+      formData.append('_nonce', (window.HRISSQ && HRISSQ.nonce) ? HRISSQ.nonce : '');
+
+      const url = (window.HRISSQ && HRISSQ.ajax) ? HRISSQ.ajax : '/wp-admin/admin-ajax.php';
+
+      fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        body: formData
+      })
+        .then(r => r.json())
+        .then(res => {
+          if (res && res.ok) {
+            msgEl.className = 'msg ok';
+            msgEl.textContent = 'Data berhasil disimpan!';
+            form.reset();
+            setTimeout(() => {
+              const dashSlug = (window.HRISSQ && HRISSQ.dashboardSlug) ? HRISSQ.dashboardSlug : 'dashboard';
+              window.location.href = '/' + dashSlug.replace(/^\/+/, '') + '/';
+            }, 1500);
+          } else {
+            msgEl.className = 'msg error';
+            msgEl.textContent = (res && res.msg) ? res.msg : 'Gagal menyimpan data.';
+          }
+        })
+        .catch(err => {
+          msgEl.className = 'msg error';
+          msgEl.textContent = 'Error: ' + (err && err.message ? err.message : err);
+        })
+        .finally(() => {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Simpan';
+        });
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     bootLogin();
     bootLogoutButton();
     bootIdleLogout();
+    bootTrainingForm();
   });
 })();

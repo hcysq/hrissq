@@ -98,3 +98,15 @@ a:hover{opacity:.9}
 .modal .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
 .modal input{width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:10px}
 .modal-msg{margin-top:8px;font-size:13px}
+
+/* Training Form */
+.hrissq-form-wrap{max-width:680px;margin:30px auto;padding:24px;background:var(--card);border-radius:16px;box-shadow:0 8px 24px rgba(2,6,23,.06)}
+.hrissq-form-wrap h2{margin:0 0 8px;font-size:24px;font-weight:800}
+.hrissq-form-wrap > p{color:var(--muted);margin-bottom:18px}
+.training-form .form-group{margin-bottom:14px}
+.training-form label{display:block;margin-bottom:6px;font-weight:600}
+.training-form input,.training-form select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+.training-form input:focus,.training-form select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 4px var(--ring)}
+.training-form small{display:block;margin-top:4px;color:var(--muted);font-size:12px}
+.training-form .btn-primary{display:inline-block;background:var(--brand);color:#fff;border:none;border-radius:10px;padding:12px 20px;font-weight:700;cursor:pointer;margin-right:8px}
+.training-form .btn-light{display:inline-block;background:#e5e7eb;color:#334155;border:none;border-radius:10px;padding:12px 20px;font-weight:600;cursor:pointer;text-decoration:none}

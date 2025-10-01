@@ -8,34 +8,38 @@ class Installer {
     global $wpdb;
     $charset = $wpdb->get_charset_collate();
 
-    $t_emp = $wpdb->prefix.'hrissq_employees';
-    $t_tr  = $wpdb->prefix.'hrissq_trainings';
-    $t_pf  = $wpdb->prefix.'hrissq_profiles';
+    $t_users = $wpdb->prefix.'hrissq_users';
+    $t_tr    = $wpdb->prefix.'hrissq_trainings';
+    $t_pf    = $wpdb->prefix.'hrissq_profiles';
 
-    $sql1 = "CREATE TABLE IF NOT EXISTS $t_emp (
+    // Tabel users (untuk autentikasi)
+    $sql1 = "CREATE TABLE IF NOT EXISTS $t_users (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       nip VARCHAR(32) NOT NULL UNIQUE,
       nama VARCHAR(191) NOT NULL,
       jabatan VARCHAR(191) DEFAULT '',
       unit VARCHAR(191) DEFAULT '',
-      hp VARCHAR(32) DEFAULT '',
+      no_hp VARCHAR(32) DEFAULT '',
+      password VARCHAR(255) DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) $charset;";
 
+    // Tabel trainings (rekam data pelatihan)
     $sql2 = "CREATE TABLE IF NOT EXISTS $t_tr (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-      employee_id BIGINT UNSIGNED NOT NULL,
+      user_id BIGINT UNSIGNED NOT NULL,
       nama_pelatihan VARCHAR(255) NOT NULL,
       tahun INT NOT NULL,
       pembiayaan VARCHAR(32) NOT NULL,
       kategori VARCHAR(32) NOT NULL,
       file_url TEXT DEFAULT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      INDEX (employee_id),
-      CONSTRAINT fk_emp FOREIGN KEY (employee_id) REFERENCES $t_emp(id) ON DELETE CASCADE
+      INDEX (user_id),
+      CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES $t_users(id) ON DELETE CASCADE
     ) $charset;";
 
+    // Tabel profiles (mirror dari CSV profil pegawai)
     $sql3 = "CREATE TABLE IF NOT EXISTS $t_pf (
       id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       nip VARCHAR(32) NOT NULL UNIQUE,
@@ -63,6 +67,9 @@ class Installer {
     // Jadwalkan import harian (kalau belum)
     if (!wp_next_scheduled('hrissq_profiles_cron')) {
       wp_schedule_event(time() + 600, 'daily', 'hrissq_profiles_cron');
+    }
+    if (!wp_next_scheduled('hrissq_users_cron')) {
+      wp_schedule_event(time() + 600, 'daily', 'hrissq_users_cron');
     }
   }
 }

@@ -21,9 +21,9 @@ public static function forgot_password(){
   $nip = sanitize_text_field($_POST['nip'] ?? '');
   if (!$nip) wp_send_json(['ok'=>false,'msg'=>'NIP wajib diisi']);
 
-  // cari nama pegawai (opsional)
-  global $wpdb; 
-  $t = $wpdb->prefix.'hrissq_employees';
+  // cari nama pegawai dari hrissq_users
+  global $wpdb;
+  $t = $wpdb->prefix.'hrissq_users';
   $emp = $wpdb->get_row($wpdb->prepare("SELECT nama FROM $t WHERE nip=%s", $nip));
   $nama = $emp ? $emp->nama : '(NIP tidak terdaftar)';
 
@@ -117,6 +117,23 @@ public static function forgot_password(){
       'kategori'       => $kategori,
       'file_url'       => $file_url
     ], ['%d','%s','%d','%s','%s','%s']);
+
+    // Kirim data ke Google Sheet
+    $sheet_data = [
+      'user_id'        => intval($me->id),
+      'nip'            => $me->nip,
+      'nama'           => $me->nama,
+      'unit'           => $me->unit,
+      'jabatan'        => $me->jabatan,
+      'nama_pelatihan' => $nama,
+      'tahun'          => $tahun,
+      'pembiayaan'     => $pembiayaan,
+      'kategori'       => $kategori,
+      'file_url'       => $file_url,
+      'timestamp'      => current_time('mysql')
+    ];
+
+    Trainings::submit_to_sheet($sheet_data);
 
     wp_send_json(['ok'=>true]);
   }

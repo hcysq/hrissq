@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: HRIS SQ (hrissq)
- * Description: Login NIP+HP, Dashboard Pegawai, Form Pelatihan (MySQL, no Google Sheet).
- * Version: 1.0.2
+ * Description: Login NIP+HP, Dashboard Pegawai, Form Pelatihan dengan Google Sheets Integration.
+ * Version: 1.0.3
  * Author: samijaya
  */
 
@@ -39,7 +39,7 @@ hrissq_log('hrissq plugin boot...');
 /* =======================================================
  *  Konstanta plugin
  * ======================================================= */
-if (!defined('HRISSQ_VER')) define('HRISSQ_VER', '1.0.2');
+if (!defined('HRISSQ_VER')) define('HRISSQ_VER', '1.0.3');
 if (!defined('HRISSQ_DIR')) define('HRISSQ_DIR', plugin_dir_path(__FILE__));
 if (!defined('HRISSQ_URL')) define('HRISSQ_URL', plugin_dir_url(__FILE__));
 
@@ -61,10 +61,9 @@ require_once HRISSQ_DIR . 'includes/Auth.php';
 require_once HRISSQ_DIR . 'includes/Api.php';
 require_once HRISSQ_DIR . 'includes/View.php';
 require_once HRISSQ_DIR . 'includes/Profiles.php';
+require_once HRISSQ_DIR . 'includes/Users.php';
+require_once HRISSQ_DIR . 'includes/Trainings.php';
 require_once HRISSQ_DIR . 'includes/Admin.php';
-// NOTE: Jangan include Profiles.php/Admin.php sebelum file-nya benar-benar ada.
-// require_once HRISSQ_DIR . 'includes/Profiles.php';
-// require_once HRISSQ_DIR . 'includes/Admin.php';
 
 /* =======================================================
  *  Activation (create tables)
@@ -84,9 +83,10 @@ add_action('wp_ajax_nopriv_hrissq_forgot', ['HRISSQ\\Api','forgot_password']);
 
   // data ke JS
   wp_localize_script('hrissq', 'HRISSQ', [
-    'ajax'      => admin_url('admin-ajax.php'),
-    'nonce'     => wp_create_nonce('hrissq-nonce'),
-    'loginSlug' => HRISSQ_LOGIN_SLUG,
+    'ajax'          => admin_url('admin-ajax.php'),
+    'nonce'         => wp_create_nonce('hrissq-nonce'),
+    'loginSlug'     => HRISSQ_LOGIN_SLUG,
+    'dashboardSlug' => HRISSQ_DASHBOARD_SLUG,
   ]);
 
   // shortcodes
@@ -105,9 +105,19 @@ add_action('wp_ajax_hrissq_submit_training', ['HRISSQ\\Api', 'submit_training'])
 add_action('wp_ajax_nopriv_hrissq_submit_training', function(){
   wp_send_json(['ok'=>false,'msg'=>'Unauthorized']);
 });
+// Cron untuk import profil pegawai
 add_action('hrissq_profiles_cron', function(){
   $url = \HRISSQ\Profiles::get_csv_url();
   if ($url) \HRISSQ\Profiles::import_from_csv($url);
+});
+
+// Cron untuk import users
+add_action('hrissq_users_cron', function(){
+  $sheet_id = \HRISSQ\Users::get_sheet_id();
+  if ($sheet_id) {
+    $url = "https://docs.google.com/spreadsheets/d/{$sheet_id}/export?format=csv&gid=0";
+    \HRISSQ\Users::import_from_csv($url);
+  }
 });
 add_action('admin_menu', ['HRISSQ\\Admin','menu']);
 

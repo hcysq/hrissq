@@ -81,9 +81,11 @@ class Auth {
 
   public static function logout(){
     if (!empty($_COOKIE['hrissq_token'])) {
-      delete_transient('hrissq_sess_' . sanitize_text_field($_COOKIE['hrissq_token']));
-      setcookie('hrissq_token', '', time() - 3600, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''));
+      $token = sanitize_text_field($_COOKIE['hrissq_token']);
+      delete_transient('hrissq_sess_' . $token);
+      setcookie('hrissq_token', '', time() - 3600, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''), is_ssl(), true);
     }
+    return true;
   }
 
   public static function current_user(){
