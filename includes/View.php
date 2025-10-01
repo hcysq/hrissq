@@ -12,13 +12,15 @@ class View {
     ob_start(); ?>
     <div class="hrissq-auth-wrap">
       <div class="auth-card">
-        <h2>Hubungi Kami<br> Sekarang</h2>
+        <div class="auth-header">
+          <h2>Masuk ke Akun Guru/Pegawai</h2>
+        </div>
 
         <form id="hrissq-login-form" class="auth-form">
-          <label>NIP <span class="req">*</span></label>
-          <input type="text" name="nip" placeholder="2020xxxxxxxxxxxx" autocomplete="username" required>
+          <label>Akun <span class="req">*</span></label>
+          <input type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
 
-          <label>Password <span class="req">*</span></label>
+          <label>Pasword <span class="req">*</span></label>
           <div class="pw-row">
             <input id="hrissq-pw" type="password" name="pw" placeholder="No HP (62812xxxxxxx)" autocomplete="current-password" required>
             <button type="button" id="hrissq-eye" class="eye">lihat</button>
@@ -55,101 +57,168 @@ class View {
     $me = Auth::current_user();
     if (!$me) { wp_safe_redirect(site_url('/'.HRISSQ_LOGIN_SLUG)); exit; }
 
-    // ambil profil mirror (jika tersedia)
-    $prof = null;
-    if (class_exists('\\HRISSQ\\Profiles') && method_exists('\\HRISSQ\\Profiles','get_by_nip')) {
-      $prof = \HRISSQ\Profiles::get_by_nip($me->nip);
-    }
+    $resolve = function(array $keys) use ($me){
+      foreach ($keys as $key) {
+        if (!isset($me->$key)) continue;
+        $value = $me->$key;
+        if (is_scalar($value)) {
+          $value = trim((string)$value);
+        } else {
+          $value = '';
+        }
+        if ($value !== '') return $value;
+      }
+      return '';
+    };
+
+    $unit    = $resolve(['unit','unit_kerja','unitkerja','unitkerja_nama']);
+    $jabatan = $resolve(['jabatan','posisi','position']);
+    $hp      = $resolve(['no_hp','hp','telepon','phone']);
+    $email   = $resolve(['email','mail']);
+    $tempat  = $resolve(['tempat_lahir','tempatlahir','birth_place']);
+    $tanggal = $resolve(['tanggal_lahir','tgl_lahir','birth_date']);
+    $tmt     = $resolve(['tmt','tmt_mulai','tanggal_mulai']);
+
+    $alamatUtama = $resolve(['alamat','alamat_ktp','alamat_domisili','alamatdomisili','alamat_rumah']);
+    $alamatParts = array_filter([
+      $alamatUtama,
+      $resolve(['desa','kelurahan','desa_kelurahan']),
+      $resolve(['kecamatan']),
+      $resolve(['kota','kabupaten','kota_kabupaten']),
+      $resolve(['kode_pos','kodepos'])
+    ], function($val){ return $val !== ''; });
+    $alamatFull = $alamatParts ? implode(', ', $alamatParts) : '';
+
+    $profileRows = [
+      ['label' => 'Nama', 'value' => isset($me->nama) ? trim((string)$me->nama) : ''],
+      ['label' => 'NIP', 'value' => isset($me->nip) ? trim((string)$me->nip) : ''],
+      ['label' => 'Tempat & Tanggal Lahir', 'value' => trim($tempat . ($tempat && $tanggal ? ', ' : '') . $tanggal)],
+      ['label' => 'Alamat', 'value' => $alamatFull],
+      ['label' => 'TMT', 'value' => $tmt],
+    ];
+
+    $contactLines = array_values(array_filter([
+      $hp ? 'HP: '.$hp : '',
+      $email ? 'Email: '.$email : ''
+    ], function($val){ return $val !== ''; }));
 
     wp_enqueue_style('hrissq');
     wp_enqueue_script('hrissq');
 
     ob_start(); ?>
-    <div class="hrissq-dashboard">
+    <div class="hrissq-dashboard" id="hrissq-dashboard">
 
       <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="logo"><span>SQ Pegawai</span></div>
-        <nav>
-          <a href="<?= esc_url(site_url('/'.HRISSQ_DASHBOARD_SLUG)) ?>">Dashboard</a>
+      <aside class="hrissq-sidebar" id="hrissq-sidebar" aria-label="Navigasi utama">
+        <div class="hrissq-sidebar-header">
+          <span class="hrissq-sidebar-logo">SQ Pegawai</span>
+          <button type="button" class="hrissq-icon-button hrissq-sidebar-close" id="hrissq-sidebar-close" aria-label="Tutup menu navigasi">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <nav class="hrissq-sidebar-nav">
+          <a class="is-active" href="<?= esc_url(site_url('/'.HRISSQ_DASHBOARD_SLUG)) ?>">Dashboard</a>
           <a href="#">Profil</a>
           <a href="#">Slip Gaji</a>
           <a href="#">Rekap Absensi</a>
           <a href="#">Riwayat Kepegawaian</a>
-          <a href="#">Cuti & Izin</a>
+          <a href="#">Cuti &amp; Izin</a>
           <a href="#">Penilaian Kinerja</a>
-          <a href="#">Tugas & Komunikasi</a>
+          <a href="#">Tugas &amp; Komunikasi</a>
           <a href="#">Administrasi Lain</a>
           <hr>
           <a href="#">Panduan</a>
           <a href="#">Support</a>
         </nav>
+        <div class="hrissq-sidebar-meta">
+          <span>Versi <?= esc_html(HRISSQ_VER) ?></span>
+        </div>
       </aside>
 
+      <div class="hrissq-sidebar-overlay" id="hrissq-sidebar-overlay" aria-hidden="true"></div>
+
       <!-- Main -->
-      <main class="content">
-        <!-- Header -->
-        <header class="topbar">
-          <h2>Dashboard Pegawai</h2>
-          <div class="user-menu">
-            <span class="user-name"><?= esc_html($me->nama) ?></span>
-            <div class="dropdown">
-              <a href="#">Perbarui Profil</a>
-              <a href="#">Ganti Password</a>
-              <a href="#" id="hrissq-logout">Keluar</a>
+      <main class="hrissq-main">
+        <header class="hrissq-topbar">
+          <div class="hrissq-topbar-left">
+            <button type="button" class="hrissq-icon-button hrissq-menu-toggle" id="hrissq-sidebar-toggle" aria-label="Buka menu navigasi" aria-expanded="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+            <div>
+              <h1 class="hrissq-page-title">Dashboard Pegawai</h1>
+              <p class="hrissq-page-subtitle">Ringkasan informasi dan tindakan penting untuk akun Anda.</p>
             </div>
+          </div>
+          <div class="hrissq-user">
+            <div class="hrissq-user-meta">
+              <span class="hrissq-user-name"><?= esc_html($me->nama) ?></span>
+              <span class="hrissq-user-role">NIP: <?= esc_html($me->nip ?? '-') ?></span>
+            </div>
+            <button type="button" class="btn-light" id="hrissq-logout">Keluar</button>
           </div>
         </header>
 
-        <!-- Cards -->
-        <section class="cards">
-          <div class="card">
-            <h3>Status Data</h3>
-            <p>Butuh Pembaruan.<br>Lengkapi riwayat pelatihan Anda.</p>
-            <a href="<?= esc_url(site_url('/'.HRISSQ_FORM_SLUG)) ?>">Isi Form Pelatihan →</a>
-          </div>
+        <div class="hrissq-main-body">
+          <section class="hrissq-card-grid hrissq-card-grid--3">
+            <article class="hrissq-card hrissq-card-highlight">
+              <h3 class="hrissq-card-title">Status Data</h3>
+              <p>Butuh pembaruan. Lengkapi riwayat pelatihan Anda untuk memastikan data tetap mutakhir.</p>
+              <a class="hrissq-card-link" href="<?= esc_url(site_url('/'.HRISSQ_FORM_SLUG)) ?>">Isi Form Pelatihan</a>
+            </article>
 
-          <div class="card">
-            <h3>Unit & Jabatan</h3>
-            <p>
-              <?= esc_html($prof->unit ?? $me->unit ?? '-') ?><br>
-              Jabatan: <?= esc_html($prof->jabatan ?? $me->jabatan ?? '-') ?>
-            </p>
-          </div>
+            <article class="hrissq-card">
+              <h3 class="hrissq-card-title">Unit &amp; Jabatan</h3>
+              <dl class="hrissq-meta-list">
+                <div>
+                  <dt>Unit</dt>
+              <dd><?= esc_html($unit !== '' ? $unit : ($me->unit ?? '-')) ?></dd>
+            </div>
+            <div>
+              <dt>Jabatan</dt>
+              <dd><?= esc_html($jabatan !== '' ? $jabatan : ($me->jabatan ?? '-')) ?></dd>
+            </div>
+          </dl>
+        </article>
 
-          <div class="card">
-            <h3>Profil Ringkas</h3>
-            <?php if ($prof): ?>
-              <p>
-                <b><?= esc_html($prof->nama) ?></b><br>
-                NIP: <?= esc_html($prof->nip) ?><br>
-                TTL: <?= esc_html(($prof->tempat_lahir ?: '-').', '.($prof->tanggal_lahir ?: '-')) ?><br>
-                HP: <?= esc_html($prof->hp ?: '-') ?> • Email: <?= esc_html($prof->email ?: '-') ?><br>
-                Alamat KTP: <?= esc_html($prof->alamat_ktp ?: '-') ?>,
-                <?= esc_html($prof->desa ?: '-') ?>, <?= esc_html($prof->kecamatan ?: '-') ?>,
-                <?= esc_html($prof->kota ?: '-') ?> <?= esc_html($prof->kode_pos ?: '') ?><br>
-                TMT: <?= esc_html($prof->tmt ?: '-') ?>
-              </p>
+        <article class="hrissq-card">
+          <h3 class="hrissq-card-title">Kontak Utama</h3>
+          <p>
+            <?php if ($contactLines): ?>
+              <?php foreach ($contactLines as $idx => $line): ?>
+                <?= esc_html($line) ?><?php if ($idx < count($contactLines) - 1): ?><br><?php endif; ?>
+              <?php endforeach; ?>
             <?php else: ?>
-              <p>Belum ada data profil untuk NIP ini. (Coba jalankan import CSV di Tools → HRISSQ Import)</p>
+              <span>-</span>
             <?php endif; ?>
-          </div>
+          </p>
+        </article>
+      </section>
 
-          <div class="card">
-            <h3>Pengumuman</h3>
-            <p>SPMB Dibuka.<br>Cek info terbaru di bawah.</p>
-          </div>
-        </section>
+      <section class="hrissq-card-grid hrissq-card-grid--2">
+        <article class="hrissq-card">
+          <h3 class="hrissq-card-title">Profil Ringkas</h3>
+          <dl class="hrissq-meta-list">
+            <?php foreach ($profileRows as $row): ?>
+              <div>
+                <dt><?= esc_html($row['label']) ?></dt>
+                <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
+              </div>
+            <?php endforeach; ?>
+          </dl>
+        </article>
 
-        <!-- News / Announcement -->
-        <section class="news">
-          <h3>Berita & Pengumuman</h3>
-          <ul>
-            <li><b>Pembaruan Data Pegawai</b> – Segera isi form profil terbaru.</li>
-            <li><b>SPMB 2026/2027</b> – Pendaftaran telah dibuka.</li>
-            <li><b>Agenda Internal</b> – Training Sabtu pekan ini.</li>
-          </ul>
-        </section>
+            <article class="hrissq-card">
+              <h3 class="hrissq-card-title">Pengumuman</h3>
+              <ul class="hrissq-bullet-list">
+                <li><strong>Pembaruan Data Pegawai</strong> – Segera isi form profil terbaru.</li>
+                <li><strong>SPMB 2026/2027</strong> – Pendaftaran telah dibuka.</li>
+                <li><strong>Agenda Internal</strong> – Training Sabtu pekan ini.</li>
+              </ul>
+            </article>
+          </section>
+        </div>
       </main>
     </div>
 

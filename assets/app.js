@@ -52,7 +52,7 @@
 
       const nip = (form.nip.value || '').trim();
       const pwv = (form.pw.value || '').trim();
-      if (!nip || !pwv) { msg.textContent = 'NIP & Password wajib diisi.'; return; }
+      if (!nip || !pwv) { msg.textContent = 'Akun & Pasword wajib diisi.'; return; }
 
       ajax('hrissq_login', { nip, pw: pwv })
         .then(res => {
@@ -118,13 +118,113 @@
       btn.disabled = true;
       const old = btn.textContent;
       btn.textContent = 'Keluar…';
+      const redirectToLogin = () => {
+        const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+        window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
+      };
       ajax('hrissq_logout', {})
+        .then(redirectToLogin)
+        .catch(redirectToLogin)
         .finally(() => {
-          const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
-          const to = '/' + slug + (window.location.pathname.endsWith('/') ? '' : '/');
-          window.location.href = to;
+          btn.textContent = old;
+          btn.disabled = false;
         });
     });
+  }
+
+  // --- DASHBOARD: sidebar toggle ---
+  function bootSidebarToggle() {
+    const layout = document.getElementById('hrissq-dashboard');
+    const sidebar = document.getElementById('hrissq-sidebar');
+    const toggle = document.getElementById('hrissq-sidebar-toggle');
+    if (!layout || !sidebar || !toggle) return;
+
+    const overlay = document.getElementById('hrissq-sidebar-overlay');
+    const closeBtn = document.getElementById('hrissq-sidebar-close');
+    const mq = window.matchMedia('(max-width: 960px)');
+
+    function isMobile() {
+      return mq.matches;
+    }
+
+    function setAria(open) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      sidebar.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (overlay) {
+        const overlayVisible = isMobile() && open;
+        overlay.setAttribute('aria-hidden', overlayVisible ? 'false' : 'true');
+      }
+    }
+
+    function openMobile() {
+      sidebar.classList.add('is-open');
+      if (overlay) overlay.classList.add('is-visible');
+      setAria(true);
+    }
+
+    function closeMobile() {
+      sidebar.classList.remove('is-open');
+      if (overlay) overlay.classList.remove('is-visible');
+      setAria(false);
+    }
+
+    function toggleDesktop() {
+      const collapsed = layout.classList.toggle('is-collapsed');
+      setAria(!collapsed);
+    }
+
+    function handleChange() {
+      if (isMobile()) {
+        layout.classList.remove('is-collapsed');
+        if (sidebar.classList.contains('is-open')) {
+          setAria(true);
+          if (overlay) overlay.classList.add('is-visible');
+        } else {
+          setAria(false);
+          if (overlay) overlay.classList.remove('is-visible');
+        }
+      } else {
+        sidebar.classList.remove('is-open');
+        if (overlay) overlay.classList.remove('is-visible');
+        const collapsed = layout.classList.contains('is-collapsed');
+        setAria(!collapsed);
+      }
+    }
+
+    toggle.addEventListener('click', function () {
+      if (isMobile()) {
+        if (sidebar.classList.contains('is-open')) {
+          closeMobile();
+        } else {
+          openMobile();
+        }
+      } else {
+        toggleDesktop();
+      }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        if (isMobile()) {
+          closeMobile();
+        } else {
+          layout.classList.add('is-collapsed');
+          setAria(false);
+        }
+      });
+    }
+
+    if (overlay) {
+      overlay.addEventListener('click', closeMobile);
+    }
+
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handleChange);
+    } else if (mq.addListener) {
+      mq.addListener(handleChange);
+    }
+
+    handleChange();
   }
 
   // --- AUTO LOGOUT (Idle 15 menit, warning 30 detik) ---
@@ -169,7 +269,7 @@
     function doLogout() {
       ajax('hrissq_logout', {}).finally(() => {
         const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
-        window.location.href = '/' + slug + '/';
+        window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
       });
     }
 
@@ -229,7 +329,15 @@
             }, 1500);
           } else {
             msgEl.className = 'msg error';
-            msgEl.textContent = (res && res.msg) ? res.msg : 'Gagal menyimpan data.';
+            if (res && res.msg === 'Unauthorized') {
+              msgEl.textContent = 'Sesi Anda berakhir. Silakan login kembali.';
+              setTimeout(() => {
+                const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+                window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
+              }, 1200);
+            } else {
+              msgEl.textContent = (res && res.msg) ? res.msg : 'Gagal menyimpan data.';
+            }
           }
         })
         .catch(err => {
@@ -246,6 +354,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     bootLogin();
     bootLogoutButton();
+    bootSidebarToggle();
     bootIdleLogout();
     bootTrainingForm();
   });
