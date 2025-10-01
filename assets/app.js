@@ -127,6 +127,101 @@
     });
   }
 
+  // --- DASHBOARD: sidebar toggle ---
+  function bootSidebarToggle() {
+    const layout = document.getElementById('hrissq-dashboard');
+    const sidebar = document.getElementById('hrissq-sidebar');
+    const toggle = document.getElementById('hrissq-sidebar-toggle');
+    if (!layout || !sidebar || !toggle) return;
+
+    const overlay = document.getElementById('hrissq-sidebar-overlay');
+    const closeBtn = document.getElementById('hrissq-sidebar-close');
+    const mq = window.matchMedia('(max-width: 960px)');
+
+    function isMobile() {
+      return mq.matches;
+    }
+
+    function setAria(open) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      sidebar.setAttribute('aria-hidden', open ? 'false' : 'true');
+      if (overlay) {
+        const overlayVisible = isMobile() && open;
+        overlay.setAttribute('aria-hidden', overlayVisible ? 'false' : 'true');
+      }
+    }
+
+    function openMobile() {
+      sidebar.classList.add('is-open');
+      if (overlay) overlay.classList.add('is-visible');
+      setAria(true);
+    }
+
+    function closeMobile() {
+      sidebar.classList.remove('is-open');
+      if (overlay) overlay.classList.remove('is-visible');
+      setAria(false);
+    }
+
+    function toggleDesktop() {
+      const collapsed = layout.classList.toggle('is-collapsed');
+      setAria(!collapsed);
+    }
+
+    function handleChange() {
+      if (isMobile()) {
+        layout.classList.remove('is-collapsed');
+        if (sidebar.classList.contains('is-open')) {
+          setAria(true);
+          if (overlay) overlay.classList.add('is-visible');
+        } else {
+          setAria(false);
+          if (overlay) overlay.classList.remove('is-visible');
+        }
+      } else {
+        sidebar.classList.remove('is-open');
+        if (overlay) overlay.classList.remove('is-visible');
+        const collapsed = layout.classList.contains('is-collapsed');
+        setAria(!collapsed);
+      }
+    }
+
+    toggle.addEventListener('click', function () {
+      if (isMobile()) {
+        if (sidebar.classList.contains('is-open')) {
+          closeMobile();
+        } else {
+          openMobile();
+        }
+      } else {
+        toggleDesktop();
+      }
+    });
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        if (isMobile()) {
+          closeMobile();
+        } else {
+          layout.classList.add('is-collapsed');
+          setAria(false);
+        }
+      });
+    }
+
+    if (overlay) {
+      overlay.addEventListener('click', closeMobile);
+    }
+
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handleChange);
+    } else if (mq.addListener) {
+      mq.addListener(handleChange);
+    }
+
+    handleChange();
+  }
+
   // --- AUTO LOGOUT (Idle 15 menit, warning 30 detik) ---
   function bootIdleLogout() {
     const backdrop = document.getElementById('hrq-idle-backdrop');
@@ -246,6 +341,7 @@
   document.addEventListener('DOMContentLoaded', function () {
     bootLogin();
     bootLogoutButton();
+    bootSidebarToggle();
     bootIdleLogout();
     bootTrainingForm();
   });
