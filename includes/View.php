@@ -56,18 +56,50 @@ class View {
   public static function dashboard(){
     $me = Auth::current_user();
     if (!$me) { wp_safe_redirect(site_url('/'.HRISSQ_LOGIN_SLUG)); exit; }
+    $resolve = function(array $keys) use ($me){
+      foreach ($keys as $key) {
+        if (!isset($me->$key)) continue;
+        $value = $me->$key;
+        if (is_scalar($value)) {
+          $value = trim((string)$value);
+        } else {
+          $value = '';
+        }
+        if ($value !== '') return $value;
+      }
+      return '';
+    };
 
-    $unit  = $me->unit ?? '';
-    $role  = $me->jabatan ?? '';
-    $phone = $me->no_hp ?? '';
+    $unit    = $resolve(['unit','unit_kerja','unitkerja','unitkerja_nama']);
+    $jabatan = $resolve(['jabatan','posisi','position']);
+    $hp      = $resolve(['no_hp','hp','telepon','phone']);
+    $email   = $resolve(['email','mail']);
+    $tempat  = $resolve(['tempat_lahir','tempatlahir','birth_place']);
+    $tanggal = $resolve(['tanggal_lahir','tgl_lahir','birth_date']);
+    $tmt     = $resolve(['tmt','tmt_mulai','tanggal_mulai']);
 
-    $profile_rows = [
-      ['label' => 'Nama',      'value' => $me->nama ?? '-'],
-      ['label' => 'Akun (NIP)', 'value' => $me->nip ?? '-'],
-      ['label' => 'Jabatan',   'value' => $role !== '' ? $role : '-'],
-      ['label' => 'Unit Kerja','value' => $unit !== '' ? $unit : '-'],
-      ['label' => 'No. HP',    'value' => $phone !== '' ? $phone : '-'],
+    $alamatUtama = $resolve(['alamat','alamat_ktp','alamat_domisili','alamatdomisili','alamat_rumah']);
+    $alamatParts = array_filter([
+      $alamatUtama,
+      $resolve(['desa','kelurahan','desa_kelurahan']),
+      $resolve(['kecamatan']),
+      $resolve(['kota','kabupaten','kota_kabupaten']),
+      $resolve(['kode_pos','kodepos'])
+    ], function($val){ return $val !== ''; });
+    $alamatFull = $alamatParts ? implode(', ', $alamatParts) : '';
+
+    $profileRows = [
+      ['label' => 'Nama', 'value' => isset($me->nama) ? trim((string)$me->nama) : ''],
+      ['label' => 'NIP', 'value' => isset($me->nip) ? trim((string)$me->nip) : ''],
+      ['label' => 'Tempat & Tanggal Lahir', 'value' => trim($tempat . ($tempat && $tanggal ? ', ' : '') . $tanggal)],
+      ['label' => 'Alamat', 'value' => $alamatFull],
+      ['label' => 'TMT', 'value' => $tmt],
     ];
+
+    $contactLines = array_values(array_filter([
+      $hp ? 'HP: '.$hp : '',
+      $email ? 'Email: '.$email : ''
+    ], function($val){ return $val !== ''; }));
 
     wp_enqueue_style('hrissq');
     wp_enqueue_script('hrissq');
@@ -117,11 +149,12 @@ class View {
               <h1 class="hrissq-page-title">Dashboard Pegawai</h1>
               <p class="hrissq-page-subtitle">Ringkasan informasi dan tindakan penting untuk akun Anda.</p>
             </div>
+            <button type="button" class="btn-light" id="hrissq-logout">Keluar</button>
           </div>
           <div class="hrissq-user">
             <div class="hrissq-user-meta">
               <span class="hrissq-user-name"><?= esc_html($me->nama) ?></span>
-              <span class="hrissq-user-role">Akun: <?= esc_html($me->nip ?? '-') ?></span>
+              <span class="hrissq-user-role">NIP: <?= esc_html($me->nip ?? '-') ?></span>
             </div>
             <button type="button" class="btn-light" id="hrissq-logout">Keluar</button>
           </div>
@@ -131,7 +164,7 @@ class View {
           <section class="hrissq-card-grid hrissq-card-grid--3">
             <article class="hrissq-card hrissq-card-highlight">
               <h3 class="hrissq-card-title">Status Data</h3>
-              <p>Lengkapi riwayat pelatihan agar data layanan kepegawaian selalu akurat.</p>
+              <p>Butuh pembaruan. Lengkapi riwayat pelatihan Anda untuk memastikan data tetap mutakhir.</p>
               <a class="hrissq-card-link" href="<?= esc_url(site_url('/'.HRISSQ_FORM_SLUG)) ?>">Isi Form Pelatihan</a>
             </article>
 
@@ -140,36 +173,41 @@ class View {
               <dl class="hrissq-meta-list">
                 <div>
                   <dt>Unit</dt>
-                  <dd><?= esc_html($unit !== '' ? $unit : '-') ?></dd>
-                </div>
-                <div>
-                  <dt>Jabatan</dt>
-                  <dd><?= esc_html($role !== '' ? $role : '-') ?></dd>
-                </div>
-              </dl>
-            </article>
+              <dd><?= esc_html($unit !== '' ? $unit : ($me->unit ?? '-')) ?></dd>
+            </div>
+            <div>
+              <dt>Jabatan</dt>
+              <dd><?= esc_html($jabatan !== '' ? $jabatan : ($me->jabatan ?? '-')) ?></dd>
+            </div>
+          </dl>
+        </article>
 
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Kontak Utama</h3>
-              <p>
-                No. HP: <?= esc_html($phone !== '' ? $phone : '-') ?><br>
-                Email: -
-              </p>
-            </article>
-          </section>
+        <article class="hrissq-card">
+          <h3 class="hrissq-card-title">Kontak Utama</h3>
+          <p>
+            <?php if ($contactLines): ?>
+              <?php foreach ($contactLines as $idx => $line): ?>
+                <?= esc_html($line) ?><?php if ($idx < count($contactLines) - 1): ?><br><?php endif; ?>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <span>-</span>
+            <?php endif; ?>
+          </p>
+        </article>
+      </section>
 
-          <section class="hrissq-card-grid hrissq-card-grid--2">
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Profil Ringkas</h3>
-              <dl class="hrissq-meta-list">
-                <?php foreach ($profile_rows as $row): ?>
-                  <div>
-                    <dt><?= esc_html($row['label']) ?></dt>
-                    <dd><?= esc_html($row['value']) ?></dd>
-                  </div>
-                <?php endforeach; ?>
-              </dl>
-            </article>
+      <section class="hrissq-card-grid hrissq-card-grid--2">
+        <article class="hrissq-card">
+          <h3 class="hrissq-card-title">Profil Ringkas</h3>
+          <dl class="hrissq-meta-list">
+            <?php foreach ($profileRows as $row): ?>
+              <div>
+                <dt><?= esc_html($row['label']) ?></dt>
+                <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
+              </div>
+            <?php endforeach; ?>
+          </dl>
+        </article>
 
             <article class="hrissq-card">
               <h3 class="hrissq-card-title">Pengumuman</h3>
