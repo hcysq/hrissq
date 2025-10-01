@@ -86,7 +86,7 @@
       cancelBtn && (cancelBtn.onclick = () => { backdrop.style.display = 'none'; });
       sendBtn && (sendBtn.onclick = () => {
         const nip = (npInput.value || '').trim();
-        if (!nip) { fMsg.textContent = 'NIP wajib diisi.'; return; }
+        if (!nip) { fMsg.textContent = 'Akun wajib diisi.'; return; }
         fMsg.textContent = 'Mengirim permintaan…';
 
         // NOTE: pastikan endpoint hrissq_forgot sudah ada di Api.php

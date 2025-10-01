@@ -19,7 +19,7 @@ public static function forgot_password(){
   }
 
   $nip = sanitize_text_field($_POST['nip'] ?? '');
-  if (!$nip) wp_send_json(['ok'=>false,'msg'=>'NIP wajib diisi']);
+  if (!$nip) wp_send_json(['ok'=>false,'msg'=>'Akun wajib diisi']);
 
   // cari nama pegawai dari hrissq_users
   global $wpdb;
@@ -28,7 +28,7 @@ public static function forgot_password(){
   $nama = $emp ? $emp->nama : '(NIP tidak terdaftar)';
 
   // rakit pesan
-  $message = "Permintaan reset password HRIS SQ\nNIP: {$nip}\nNama: {$nama}";
+  $message = "Permintaan reset pasword HRIS SQ\nAkun (NIP): {$nip}\nNama: {$nama}";
 
   // panggil StarSender (form-encoded + header apikey)
   $args = [

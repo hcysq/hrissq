@@ -14,7 +14,6 @@ class View {
       <div class="auth-card">
         <div class="auth-header">
           <h2>Masuk ke Akun Guru/Pegawai</h2>
-
         </div>
 
         <form id="hrissq-login-form" class="auth-form">
@@ -23,13 +22,13 @@ class View {
 
           <label>Pasword <span class="req">*</span></label>
           <div class="pw-row">
-            <input id="hrissq-pw" type="password" name="pw" placeholder="No HP (62812xxxxxxx)" autocomplete="current-password" required>
+            <input id="hrissq-pw" type="password" name="pw" placeholder="Gunakan No HP" autocomplete="current-password" required>
             <button type="button" id="hrissq-eye" class="eye">lihat</button>
           </div>
 
           <button type="submit" class="btn-primary">Masuk</button>
 
-          <button type="button" id="hrissq-forgot" class="link-forgot">Lupa password?</button>
+          <button type="button" id="hrissq-forgot" class="link-forgot">Lupa pasword?</button>
           <div class="msg" aria-live="polite"></div>
         </form>
       </div>
@@ -38,10 +37,10 @@ class View {
     <!-- Modal Lupa Password -->
     <div id="hrissq-modal" class="modal-backdrop" style="display:none;">
       <div class="modal">
-        <h3>Lupa Password</h3>
-        <p>Masukkan NIP Anda. Kami akan mengirim permintaan ke Admin HCM.</p>
-        <label>NIP</label>
-        <input id="hrissq-nip-forgot" type="text" placeholder="2020xxxxxxxxxxxx">
+        <h3>Lupa Pasword</h3>
+        <p>Masukkan Akun (NIP) Anda. Kami akan mengirim permintaan ke Admin HCM.</p>
+        <label>Akun (NIP)</label>
+        <input id="hrissq-nip-forgot" type="text" placeholder="Masukkan NIP">
         <div class="modal-actions">
           <button type="button" class="btn-light" id="hrissq-cancel">Batal</button>
           <button type="button" class="btn-primary" id="hrissq-send">Kirim</button>
@@ -57,7 +56,6 @@ class View {
   public static function dashboard(){
     $me = Auth::current_user();
     if (!$me) { wp_safe_redirect(site_url('/'.HRISSQ_LOGIN_SLUG)); exit; }
-
     $resolve = function(array $keys) use ($me){
       foreach ($keys as $key) {
         if (!isset($me->$key)) continue;
@@ -151,6 +149,7 @@ class View {
               <h1 class="hrissq-page-title">Dashboard Pegawai</h1>
               <p class="hrissq-page-subtitle">Ringkasan informasi dan tindakan penting untuk akun Anda.</p>
             </div>
+            <button type="button" class="btn-light" id="hrissq-logout">Keluar</button>
           </div>
           <div class="hrissq-user">
             <div class="hrissq-user-meta">
