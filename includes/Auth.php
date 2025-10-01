@@ -84,6 +84,8 @@ class Auth {
       $token = sanitize_text_field($_COOKIE['hrissq_token']);
       delete_transient('hrissq_sess_' . $token);
       setcookie('hrissq_token', '', time() - 3600, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''), is_ssl(), true);
+      setcookie('hrissq_token', '', time() - 3600, '/', '', is_ssl(), true);
+      unset($_COOKIE['hrissq_token']);
     }
     return true;
   }

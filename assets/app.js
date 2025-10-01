@@ -118,11 +118,16 @@
       btn.disabled = true;
       const old = btn.textContent;
       btn.textContent = 'Keluar…';
+      const redirectToLogin = () => {
+        const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+        window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
+      };
       ajax('hrissq_logout', {})
+        .then(redirectToLogin)
+        .catch(redirectToLogin)
         .finally(() => {
-          const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
-          const to = '/' + slug + (window.location.pathname.endsWith('/') ? '' : '/');
-          window.location.href = to;
+          btn.textContent = old;
+          btn.disabled = false;
         });
     });
   }
@@ -264,7 +269,7 @@
     function doLogout() {
       ajax('hrissq_logout', {}).finally(() => {
         const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
-        window.location.href = '/' + slug + '/';
+        window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
       });
     }
 
@@ -324,7 +329,15 @@
             }, 1500);
           } else {
             msgEl.className = 'msg error';
-            msgEl.textContent = (res && res.msg) ? res.msg : 'Gagal menyimpan data.';
+            if (res && res.msg === 'Unauthorized') {
+              msgEl.textContent = 'Sesi Anda berakhir. Silakan login kembali.';
+              setTimeout(() => {
+                const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+                window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
+              }, 1200);
+            } else {
+              msgEl.textContent = (res && res.msg) ? res.msg : 'Gagal menyimpan data.';
+            }
           }
         })
         .catch(err => {
