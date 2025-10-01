@@ -14,6 +14,7 @@ class View {
       <div class="auth-card">
         <div class="auth-header">
           <h2>Masuk ke Akun Guru/Pegawai</h2>
+
         </div>
 
         <form id="hrissq-login-form" class="auth-form">
