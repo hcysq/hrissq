@@ -100,6 +100,7 @@ add_action('wp_ajax_nopriv_hrissq_forgot', ['HRISSQ\\Api','forgot_password']);
  * ======================================================= */
 add_action('wp_ajax_nopriv_hrissq_login',    ['HRISSQ\\Api', 'login']);
 add_action('wp_ajax_hrissq_logout',          ['HRISSQ\\Api', 'logout']);
+add_action('wp_ajax_nopriv_hrissq_logout',   ['HRISSQ\\Api', 'logout']);
 add_action('wp_ajax_hrissq_submit_training', ['HRISSQ\\Api', 'submit_training']);
 // non-logged user dilarang submit
 add_action('wp_ajax_nopriv_hrissq_submit_training', function(){
