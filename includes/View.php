@@ -13,15 +13,15 @@ class View {
     <div class="hrissq-auth-wrap">
       <div class="auth-card">
         <div class="auth-header">
-          <h2>Hubungi Kami Sekarang</h2>
-          <p>Masuk dengan NIP dan password untuk mengakses dashboard pegawai.</p>
+          <h2>Masuk ke Akun Guru/Pegawai</h2>
+
         </div>
 
         <form id="hrissq-login-form" class="auth-form">
-          <label>NIP <span class="req">*</span></label>
-          <input type="text" name="nip" placeholder="2020xxxxxxxxxxxx" autocomplete="username" required>
+          <label>Akun <span class="req">*</span></label>
+          <input type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
 
-          <label>Password <span class="req">*</span></label>
+          <label>Pasword <span class="req">*</span></label>
           <div class="pw-row">
             <input id="hrissq-pw" type="password" name="pw" placeholder="No HP (62812xxxxxxx)" autocomplete="current-password" required>
             <button type="button" id="hrissq-eye" class="eye">lihat</button>
@@ -58,11 +58,50 @@ class View {
     $me = Auth::current_user();
     if (!$me) { wp_safe_redirect(site_url('/'.HRISSQ_LOGIN_SLUG)); exit; }
 
-    // ambil profil mirror (jika tersedia)
-    $prof = null;
-    if (class_exists('\\HRISSQ\\Profiles') && method_exists('\\HRISSQ\\Profiles','get_by_nip')) {
-      $prof = \HRISSQ\Profiles::get_by_nip($me->nip);
-    }
+    $resolve = function(array $keys) use ($me){
+      foreach ($keys as $key) {
+        if (!isset($me->$key)) continue;
+        $value = $me->$key;
+        if (is_scalar($value)) {
+          $value = trim((string)$value);
+        } else {
+          $value = '';
+        }
+        if ($value !== '') return $value;
+      }
+      return '';
+    };
+
+    $unit    = $resolve(['unit','unit_kerja','unitkerja','unitkerja_nama']);
+    $jabatan = $resolve(['jabatan','posisi','position']);
+    $hp      = $resolve(['no_hp','hp','telepon','phone']);
+    $email   = $resolve(['email','mail']);
+    $tempat  = $resolve(['tempat_lahir','tempatlahir','birth_place']);
+    $tanggal = $resolve(['tanggal_lahir','tgl_lahir','birth_date']);
+    $tmt     = $resolve(['tmt','tmt_mulai','tanggal_mulai']);
+
+    $alamatUtama = $resolve(['alamat','alamat_ktp','alamat_domisili','alamatdomisili','alamat_rumah']);
+    $alamatParts = array_filter([
+      $alamatUtama,
+      $resolve(['desa','kelurahan','desa_kelurahan']),
+      $resolve(['kecamatan']),
+      $resolve(['kota','kabupaten','kota_kabupaten']),
+      $resolve(['kode_pos','kodepos'])
+    ], function($val){ return $val !== ''; });
+    $alamatFull = $alamatParts ? implode(', ', $alamatParts) : '';
+
+    $profileRows = [
+      ['label' => 'Nama', 'value' => isset($me->nama) ? trim((string)$me->nama) : ''],
+      ['label' => 'NIP', 'value' => isset($me->nip) ? trim((string)$me->nip) : ''],
+      ['label' => 'Tempat & Tanggal Lahir', 'value' => trim($tempat . ($tempat && $tanggal ? ', ' : '') . $tanggal)],
+      ['label' => 'Alamat', 'value' => $alamatFull],
+      ['label' => 'TMT', 'value' => $tmt],
+    ];
+
+    $contactLines = array_values(array_filter([
+      $hp ? 'HP: '.$hp : '',
+      $email ? 'Email: '.$email : ''
+    ], function($val){ return $val !== ''; }));
 
     wp_enqueue_style('hrissq');
     wp_enqueue_script('hrissq');
@@ -135,54 +174,41 @@ class View {
               <dl class="hrissq-meta-list">
                 <div>
                   <dt>Unit</dt>
-                  <dd><?= esc_html($prof->unit ?? $me->unit ?? '-') ?></dd>
-                </div>
-                <div>
-                  <dt>Jabatan</dt>
-                  <dd><?= esc_html($prof->jabatan ?? $me->jabatan ?? '-') ?></dd>
-                </div>
-              </dl>
-            </article>
+              <dd><?= esc_html($unit !== '' ? $unit : ($me->unit ?? '-')) ?></dd>
+            </div>
+            <div>
+              <dt>Jabatan</dt>
+              <dd><?= esc_html($jabatan !== '' ? $jabatan : ($me->jabatan ?? '-')) ?></dd>
+            </div>
+          </dl>
+        </article>
 
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Kontak Utama</h3>
-              <p>
-                HP: <?= esc_html($prof->hp ?? $me->hp ?? '-') ?><br>
-                Email: <?= esc_html($prof->email ?? $me->email ?? '-') ?>
-              </p>
-            </article>
-          </section>
+        <article class="hrissq-card">
+          <h3 class="hrissq-card-title">Kontak Utama</h3>
+          <p>
+            <?php if ($contactLines): ?>
+              <?php foreach ($contactLines as $idx => $line): ?>
+                <?= esc_html($line) ?><?php if ($idx < count($contactLines) - 1): ?><br><?php endif; ?>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <span>-</span>
+            <?php endif; ?>
+          </p>
+        </article>
+      </section>
 
-          <section class="hrissq-card-grid hrissq-card-grid--2">
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Profil Ringkas</h3>
-              <?php if ($prof): ?>
-                <dl class="hrissq-meta-list">
-                  <div>
-                    <dt>Nama</dt>
-                    <dd><?= esc_html($prof->nama) ?></dd>
-                  </div>
-                  <div>
-                    <dt>NIP</dt>
-                    <dd><?= esc_html($prof->nip) ?></dd>
-                  </div>
-                  <div>
-                    <dt>Tempat &amp; Tanggal Lahir</dt>
-                    <dd><?= esc_html(($prof->tempat_lahir ?: '-').', '.($prof->tanggal_lahir ?: '-')) ?></dd>
-                  </div>
-                  <div>
-                    <dt>Alamat</dt>
-                    <dd><?= esc_html($prof->alamat_ktp ?: '-') ?>, <?= esc_html($prof->desa ?: '-') ?>, <?= esc_html($prof->kecamatan ?: '-') ?>, <?= esc_html($prof->kota ?: '-') ?> <?= esc_html($prof->kode_pos ?: '') ?></dd>
-                  </div>
-                  <div>
-                    <dt>TMT</dt>
-                    <dd><?= esc_html($prof->tmt ?: '-') ?></dd>
-                  </div>
-                </dl>
-              <?php else: ?>
-                <p>Belum ada data profil untuk NIP ini. Silakan jalankan import CSV melalui Tools → HRISSQ Import.</p>
-              <?php endif; ?>
-            </article>
+      <section class="hrissq-card-grid hrissq-card-grid--2">
+        <article class="hrissq-card">
+          <h3 class="hrissq-card-title">Profil Ringkas</h3>
+          <dl class="hrissq-meta-list">
+            <?php foreach ($profileRows as $row): ?>
+              <div>
+                <dt><?= esc_html($row['label']) ?></dt>
+                <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
+              </div>
+            <?php endforeach; ?>
+          </dl>
+        </article>
 
             <article class="hrissq-card">
               <h3 class="hrissq-card-title">Pengumuman</h3>

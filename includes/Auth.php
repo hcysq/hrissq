@@ -33,11 +33,11 @@ class Auth {
     $nip = trim(strval($nip));
     $plain_pass = trim(strval($plain_pass));
     if ($nip === '' || $plain_pass === '') {
-      return ['ok'=>false, 'msg'=>'NIP & Password wajib diisi'];
+      return ['ok'=>false, 'msg'=>'Akun & Pasword wajib diisi'];
     }
 
     $u = self::get_user_by_nip($nip);
-    if (!$u) return ['ok'=>false, 'msg'=>'NIP tidak ditemukan'];
+    if (!$u) return ['ok'=>false, 'msg'=>'Akun tidak ditemukan'];
 
     // 1) Jika password di DB ada dan terlihat hash -> verifikasi hash
     if (!empty($u->password)) {

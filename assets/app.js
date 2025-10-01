@@ -52,7 +52,7 @@
 
       const nip = (form.nip.value || '').trim();
       const pwv = (form.pw.value || '').trim();
-      if (!nip || !pwv) { msg.textContent = 'NIP & Password wajib diisi.'; return; }
+      if (!nip || !pwv) { msg.textContent = 'Akun & Pasword wajib diisi.'; return; }
 
       ajax('hrissq_login', { nip, pw: pwv })
         .then(res => {
