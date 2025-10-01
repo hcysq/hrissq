@@ -20,12 +20,24 @@ class Auth {
     return $wpdb->get_row($wpdb->prepare("SELECT * FROM $t WHERE nip = %s", $nip));
   }
 
-  /** Set session (token di transient + cookie) */
-  private static function set_session_for($user_id){
+  /**
+   * Set session (token disimpan di transient + cookie browser)
+   * Kita simpan NIP karena tabel hrissq_users tidak memiliki kolom ID integer.
+   */
+  private static function set_session_for($nip){
     $token = wp_generate_uuid4();
-    set_transient('hrissq_sess_'.$token, intval($user_id), HOUR_IN_SECONDS);
+    // simpan maks 12 jam supaya user tetap login lebih lama
+    set_transient('hrissq_sess_'.$token, ['nip' => $nip], 12 * HOUR_IN_SECONDS);
     // path/domain dari wp-config sudah di-set, fallback ke '/'
-    setcookie('hrissq_token', $token, time() + HOUR_IN_SECONDS, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''), is_ssl(), true);
+    setcookie(
+      'hrissq_token',
+      $token,
+      time() + (12 * HOUR_IN_SECONDS),
+      (defined('COOKIEPATH') ? COOKIEPATH : '/'),
+      (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''),
+      is_ssl(),
+      true
+    );
     return $token;
   }
 
@@ -70,7 +82,7 @@ class Auth {
     }
 
     // sukses → set session
-    self::set_session_for($u->id);
+    self::set_session_for($u->nip);
 
     return [
       'ok'   => true,
@@ -98,11 +110,21 @@ class Auth {
   public static function current_user(){
     if (empty($_COOKIE['hrissq_token'])) return null;
     $token  = sanitize_text_field($_COOKIE['hrissq_token']);
-    $userId = get_transient('hrissq_sess_' . $token);
-    if (!$userId) return null;
+    $sess   = get_transient('hrissq_sess_' . $token);
+    if (!$sess) return null;
 
-    global $wpdb;
-    $t = $wpdb->prefix . 'hrissq_users';
-    return $wpdb->get_row($wpdb->prepare("SELECT * FROM $t WHERE id = %d", $userId));
+    $nip = null;
+    if (is_array($sess) && !empty($sess['nip'])) {
+      $nip = $sess['nip'];
+    } elseif (is_object($sess) && !empty($sess->nip)) {
+      $nip = $sess->nip;
+    } elseif (is_string($sess) && trim($sess) !== '') {
+      // kompatibilitas lama ketika yang disimpan adalah ID numerik / string biasa
+      $nip = $sess;
+    }
+
+    if (!$nip) return null;
+
+    return self::get_user_by_nip($nip);
   }
 }
