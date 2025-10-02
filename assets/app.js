@@ -111,24 +111,29 @@
 
   // --- DASHBOARD: tombol Keluar ---
   function bootLogoutButton() {
-    const btn = document.getElementById('hrissq-logout');
-    if (!btn) return;
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      btn.disabled = true;
-      const old = btn.textContent;
-      btn.textContent = 'Keluar…';
-      const redirectToLogin = () => {
-        const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
-        window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
-      };
-      ajax('hrissq_logout', {})
-        .then(redirectToLogin)
-        .catch(redirectToLogin)
-        .finally(() => {
-          btn.textContent = old;
-          btn.disabled = false;
-        });
+    const buttons = document.querySelectorAll('#hrissq-logout');
+    if (!buttons.length) return;
+
+    const redirectToLogin = () => {
+      const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+      window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
+    };
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+        const old = btn.textContent;
+        btn.textContent = 'Keluar…';
+
+        ajax('hrissq_logout', {})
+          .then(redirectToLogin)
+          .catch(redirectToLogin)
+          .finally(() => {
+            btn.textContent = old;
+            btn.disabled = false;
+          });
+      });
     });
   }
 

@@ -147,9 +147,8 @@ class View {
             </button>
             <div>
               <h1 class="hrissq-page-title">Dashboard Pegawai</h1>
-              <p class="hrissq-page-subtitle">Ringkasan informasi dan tindakan penting untuk akun Anda.</p>
+              <p class="hrissq-page-subtitle">Ringkasan informasi kepegawaian</p>
             </div>
-            <button type="button" class="btn-light" id="hrissq-logout">Keluar</button>
           </div>
           <div class="hrissq-user">
             <div class="hrissq-user-meta">
@@ -162,59 +161,53 @@ class View {
 
         <div class="hrissq-main-body">
           <section class="hrissq-card-grid hrissq-card-grid--3">
-            <article class="hrissq-card hrissq-card-highlight">
-              <h3 class="hrissq-card-title">Status Data</h3>
-              <p>Butuh pembaruan. Lengkapi riwayat pelatihan Anda untuk memastikan data tetap mutakhir.</p>
-              <a class="hrissq-card-link" href="<?= esc_url(site_url('/'.HRISSQ_FORM_SLUG)) ?>">Isi Form Pelatihan</a>
-            </article>
-
             <article class="hrissq-card">
               <h3 class="hrissq-card-title">Unit &amp; Jabatan</h3>
               <dl class="hrissq-meta-list">
                 <div>
                   <dt>Unit</dt>
-              <dd><?= esc_html($unit !== '' ? $unit : ($me->unit ?? '-')) ?></dd>
-            </div>
-            <div>
-              <dt>Jabatan</dt>
-              <dd><?= esc_html($jabatan !== '' ? $jabatan : ($me->jabatan ?? '-')) ?></dd>
-            </div>
-          </dl>
-        </article>
+                  <dd><?= esc_html($unit !== '' ? $unit : ($me->unit ?? '-')) ?></dd>
+                </div>
+                <div>
+                  <dt>Jabatan</dt>
+                  <dd><?= esc_html($jabatan !== '' ? $jabatan : ($me->jabatan ?? '-')) ?></dd>
+                </div>
+              </dl>
+            </article>
 
-        <article class="hrissq-card">
-          <h3 class="hrissq-card-title">Kontak Utama</h3>
-          <p>
-            <?php if ($contactLines): ?>
-              <?php foreach ($contactLines as $idx => $line): ?>
-                <?= esc_html($line) ?><?php if ($idx < count($contactLines) - 1): ?><br><?php endif; ?>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <span>-</span>
-            <?php endif; ?>
-          </p>
-        </article>
-      </section>
+            <article class="hrissq-card">
+              <h3 class="hrissq-card-title">Kontak Utama</h3>
+              <p>
+                <?php if ($contactLines): ?>
+                  <?php foreach ($contactLines as $idx => $line): ?>
+                    <?= esc_html($line) ?><?php if ($idx < count($contactLines) - 1): ?><br><?php endif; ?>
+                  <?php endforeach; ?>
+                <?php else: ?>
+                  <span>-</span>
+                <?php endif; ?>
+              </p>
+            </article>
 
-      <section class="hrissq-card-grid hrissq-card-grid--2">
-        <article class="hrissq-card">
-          <h3 class="hrissq-card-title">Profil Ringkas</h3>
-          <dl class="hrissq-meta-list">
-            <?php foreach ($profileRows as $row): ?>
-              <div>
-                <dt><?= esc_html($row['label']) ?></dt>
-                <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
-              </div>
-            <?php endforeach; ?>
-          </dl>
-        </article>
+            <article class="hrissq-card">
+              <h3 class="hrissq-card-title">Profil Ringkas</h3>
+              <dl class="hrissq-meta-list">
+                <?php foreach ($profileRows as $row): ?>
+                  <div>
+                    <dt><?= esc_html($row['label']) ?></dt>
+                    <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
+                  </div>
+                <?php endforeach; ?>
+              </dl>
+            </article>
+          </section>
 
+          <section class="hrissq-card-grid hrissq-card-grid--1">
             <article class="hrissq-card">
               <h3 class="hrissq-card-title">Pengumuman</h3>
               <ul class="hrissq-bullet-list">
-                <li><strong>Pembaruan Data Pegawai</strong> – Segera isi form profil terbaru.</li>
-                <li><strong>SPMB 2026/2027</strong> – Pendaftaran telah dibuka.</li>
-                <li><strong>Agenda Internal</strong> – Training Sabtu pekan ini.</li>
+                <li><strong>Pembaruan Data Pegawai</strong> – <a href="<?= esc_url(site_url('/'.HRISSQ_FORM_SLUG)) ?>" target="_blank">Isi form pelatihan terbaru</a>.</li>
+                <li><strong>SPMB 2026/2027</strong> – <a href="https://ppdb.sabilulquran.or.id" target="_blank" rel="noopener">Pendaftaran telah dibuka</a>.</li>
+                <li><strong>Ikuti Sabilul Qur'an di Instagram</strong> – <a href="https://instagram.com/sabilulquran" target="_blank" rel="noopener">@sabilulquran</a>.</li>
               </ul>
             </article>
           </section>
