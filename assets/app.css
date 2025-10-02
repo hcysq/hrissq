@@ -8,9 +8,9 @@
   --ring:rgba(23,88,135,.12);
   --line:rgba(255,255,255,.22);
   --glass-border:rgba(255,255,255,.24);
-  --font-heading:15px;
-  --font-sub:13px;
-  --font-body:12px;
+  --font-heading:14px;
+  --font-sub:12px;
+  --font-body:11px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -21,12 +21,23 @@ p{margin:0 0 8px}
 
 /* Auth page */
 .hrissq-auth-wrap{min-height:60vh;display:flex;align-items:center;justify-content:center;padding:36px 16px;background:transparent}
-.auth-card{width:100%;max-width:360px;padding:18px 20px;border-radius:16px;border:1px solid var(--glass-border);background:rgba(9,19,34,.18);box-shadow:0 14px 32px rgba(8,20,38,.12);backdrop-filter:blur(18px) saturate(140%)}
+.auth-card {
+  max-width: 320px;          /* lebih ramping */
+  padding: 14px 16px;        /* lebih rapat */
+  border-radius: 12px;       /* sudut tidak terlalu bulat */
+  background: rgba(255,255,255,0.2); /* semi transparan putih */
+  border: 1px solid rgba(255,255,255,.3);
+  backdrop-filter: blur(10px);        /* blur lebih ringan */
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
+}
 .auth-header{text-align:center;margin-bottom:16px}
-.auth-header h2{margin:0;font-size:19px;font-weight:700;color:#f8fafc;letter-spacing:.01em}
+.auth-header h2 {
+  font-size: 16px;           /* turunkan dari 19px */
+  color: #1e293b;            /* lebih gelap, biar kontras dengan background */
+}
 .auth-form{display:flex;flex-direction:column;gap:10px}
-.auth-form label{display:block;font-weight:600;color:#f1f5f9;font-size:11px;letter-spacing:.01em}
-.auth-form input{width:100%;padding:9px 12px;border:1px solid rgba(255,255,255,.25);border-radius:10px;font-size:11px;background:rgba(255,255,255,.12);color:#f8fafc;backdrop-filter:blur(16px)}
+.auth-form label{display:block;font-weight:600;color:#f1f5f9;font-size:10px;letter-spacing:.01em}
+.auth-form input{width:100%;padding:9px 11px;border:1px solid rgba(255,255,255,.25);border-radius:10px;font-size:11px;background:rgba(255,255,255,.12);color:#f8fafc;backdrop-filter:blur(16px)}
 .auth-form input::placeholder{color:rgba(248,250,252,.55)}
 .auth-form input:focus{border-color:rgba(14,165,233,.6);box-shadow:0 0 0 2px var(--ring);outline:none;background:rgba(255,255,255,.18)}
 .req{color:#ef4444}
@@ -114,6 +125,11 @@ p{margin:0 0 8px}
   .hrissq-main-body{padding:18px 14px 22px}
   .hrissq-user{flex-direction:column;align-items:flex-end;gap:10px}
   .hrissq-user-meta{text-align:right}
+}
+
+@media (max-width: 480px) {
+  .auth-card { max-width: 280px; padding: 12px 14px; }
+  .auth-header h2 { font-size: 14px; }
 }
 
 /* Modal */
