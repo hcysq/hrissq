@@ -77,6 +77,54 @@ class View {
     $tempat  = $resolve(['tempat_lahir','tempatlahir','birth_place']);
     $tanggal = $resolve(['tanggal_lahir','tgl_lahir','birth_date']);
     $tmt     = $resolve(['tmt','tmt_mulai','tanggal_mulai']);
+    // Format TMT -> dd mmmm yyyy
+    $tmtFormatted = '';
+    if ($tmt) {
+      try {
+        $dt = new \DateTimeImmutable($tmt);
+        // Format sesuai lokal Indonesia
+        $formatter = new \IntlDateFormatter(
+          'id_ID',
+          \IntlDateFormatter::LONG,
+          \IntlDateFormatter::NONE,
+          'Asia/Jakarta',
+          \IntlDateFormatter::GREGORIAN,
+          'd MMMM yyyy'
+        );
+        $tmtFormatted = $formatter->format($dt);
+      } catch (\Exception $e) {
+        $tmtFormatted = $tmt; // fallback kalau parsing gagal
+      }
+    }
+
+    
+ $nik     = $resolve(['nik','no_ktp','ktp','nik_ktp','no_ktp_kk']);
+
+       // Hitung masa kerja dari TMT -> "X tahun Y bulan"
+    $masaKerja = '';
+    if ($tmt) {
+      try {
+        $d1 = new \DateTimeImmutable($tmt);
+        $d2 = new \DateTimeImmutable('now');
+        $diff = $d1->diff($d2);
+
+        $y = (int)$diff->y;
+        $m = (int)$diff->m;
+
+        if ($y > 0 && $m > 0) {
+          $masaKerja = $y.' tahun '.$m.' bulan';
+        } elseif ($y > 0) {
+          $masaKerja = $y.' tahun';
+        } elseif ($m > 0) {
+          $masaKerja = $m.' bulan';
+        } else {
+          $masaKerja = 'Kurang dari 1 bulan';
+        }
+
+      } catch (\Exception $e) {
+        $masaKerja = '';
+      }
+    }
 
     $alamatUtama = $resolve(['alamat','alamat_ktp','alamat_domisili','alamatdomisili','alamat_rumah']);
     $alamatParts = array_filter([
@@ -88,18 +136,24 @@ class View {
     ], function($val){ return $val !== ''; });
     $alamatFull = $alamatParts ? implode(', ', $alamatParts) : '';
 
-    $profileRows = [
+       // Kartu kiri: Profil Ringkas
+    $profilRingkasRows = [
       ['label' => 'Nama', 'value' => isset($me->nama) ? trim((string)$me->nama) : ''],
-      ['label' => 'NIP', 'value' => isset($me->nip) ? trim((string)$me->nip) : ''],
+      ['label' => 'NIK',  'value' => $nik],
       ['label' => 'Tempat & Tanggal Lahir', 'value' => trim($tempat . ($tempat && $tanggal ? ', ' : '') . $tanggal)],
       ['label' => 'Alamat', 'value' => $alamatFull],
-      ['label' => 'TMT', 'value' => $tmt],
+      ['label' => 'HP', 'value' => $hp],
+      ['label' => 'Email', 'value' => $email],
     ];
 
-    $contactLines = array_values(array_filter([
-      $hp ? 'HP: '.$hp : '',
-      $email ? 'Email: '.$email : ''
-    ], function($val){ return $val !== ''; }));
+    // Kartu kanan: Data Kepegawaian
+    $kepegawaianRows = [
+      ['label' => 'NIP',        'value' => isset($me->nip) ? trim((string)$me->nip) : ''],
+      ['label' => 'Jabatan',    'value' => $jabatan !== '' ? $jabatan : ($me->jabatan ?? '')],
+      ['label' => 'Unit Kerja', 'value' => $unit   !== '' ? $unit   : ($me->unit   ?? '')],
+      ['label' => 'TMT',        'value' => $tmtFormatted],
+      ['label' => 'Masa Kerja', 'value' => $masaKerja],
+    ];
 
     wp_enqueue_style('hrissq');
     wp_enqueue_script('hrissq');
@@ -160,20 +214,34 @@ class View {
         </header>
 
         <div class="hrissq-main-body">
-          <section class="hrissq-card-grid hrissq-card-grid--3">
+          <section class="hrissq-card-grid hrissq-card-grid--2">
+            <!-- Kartu 1: Profil Ringkas -->
             <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Unit &amp; Jabatan</h3>
+              <h3 class="hrissq-card-title">Profil Ringkas</h3>
               <dl class="hrissq-meta-list">
-                <div>
-                  <dt>Unit</dt>
-                  <dd><?= esc_html($unit !== '' ? $unit : ($me->unit ?? '-')) ?></dd>
-                </div>
-                <div>
-                  <dt>Jabatan</dt>
-                  <dd><?= esc_html($jabatan !== '' ? $jabatan : ($me->jabatan ?? '-')) ?></dd>
-                </div>
+                <?php foreach ($profilRingkasRows as $row): ?>
+                  <div>
+                    <dt><?= esc_html($row['label']) ?></dt>
+                    <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
+                  </div>
+                <?php endforeach; ?>
               </dl>
             </article>
+
+            <!-- Kartu 2: Data Kepegawaian -->
+            <article class="hrissq-card">
+              <h3 class="hrissq-card-title">Data Kepegawaian</h3>
+              <dl class="hrissq-meta-list">
+                <?php foreach ($kepegawaianRows as $row): ?>
+                  <div>
+                    <dt><?= esc_html($row['label']) ?></dt>
+                    <dd><?= esc_html($row['value'] !== '' ? $row['value'] : '-') ?></dd>
+                  </div>
+                <?php endforeach; ?>
+              </dl>
+            </article>
+          </section>
+
 
             <article class="hrissq-card">
               <h3 class="hrissq-card-title">Kontak Utama</h3>
