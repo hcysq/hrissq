@@ -55,9 +55,15 @@ class Admin {
         $sheet_id = sanitize_text_field($_POST['training_sheet_id'] ?? '');
         $tab_name = sanitize_text_field($_POST['training_tab_name'] ?? 'Data');
         $webapp_url = esc_url_raw($_POST['training_webapp_url'] ?? '');
+        $drive_folder = sanitize_text_field($_POST['training_drive_folder_id'] ?? '');
 
         Trainings::set_sheet_config($sheet_id, $tab_name);
         Trainings::set_webapp_url($webapp_url);
+        if ($drive_folder) {
+          Trainings::set_drive_folder_id($drive_folder);
+        } else {
+          delete_option(Trainings::OPT_TRAINING_DRIVE_FOLDER_ID);
+        }
 
         $msg .= "<strong>Training config saved.</strong><br>";
       }
@@ -68,6 +74,7 @@ class Admin {
     $users_tab_name = esc_attr(Users::get_tab_name());
     $training_sheet_id = esc_attr(Trainings::get_sheet_id());
     $training_tab_name = esc_attr(Trainings::get_tab_name());
+    $training_drive_folder = esc_attr(Trainings::get_drive_folder_id());
     $training_webapp_url = esc_url(Trainings::get_webapp_url());
     ?>
     <div class="wrap">
@@ -143,6 +150,14 @@ class Admin {
             <td>
               <input type="text" id="training_tab_name" name="training_tab_name" class="regular-text"
                      value="<?= $training_tab_name ?>" placeholder="Data">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><label for="training_drive_folder_id">Drive Folder ID</label></th>
+            <td>
+              <input type="text" id="training_drive_folder_id" name="training_drive_folder_id" class="regular-text" style="width: 600px"
+                     value="<?= $training_drive_folder ?>" placeholder="1Wpf6k5G21Zb4kAILYDL7jfCjyKZd55zp">
+              <p class="description">File sertifikat akan disimpan di folder Google Drive ini (sub-folder otomatis: <code>&lt;NIP&gt;-&lt;Nama&gt;</code>).</p>
             </td>
           </tr>
           <tr>

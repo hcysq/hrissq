@@ -20,12 +20,24 @@ class Auth {
     return $wpdb->get_row($wpdb->prepare("SELECT * FROM $t WHERE nip = %s", $nip));
   }
 
-  /** Set session (token di transient + cookie) */
-  private static function set_session_for($user_id){
+  /**
+   * Set session (token disimpan di transient + cookie browser)
+   * Kita simpan NIP karena tabel hrissq_users tidak memiliki kolom ID integer.
+   */
+  private static function set_session_for($nip){
     $token = wp_generate_uuid4();
-    set_transient('hrissq_sess_'.$token, intval($user_id), HOUR_IN_SECONDS);
+    // simpan maks 12 jam supaya user tetap login lebih lama
+    set_transient('hrissq_sess_'.$token, ['nip' => $nip], 12 * HOUR_IN_SECONDS);
     // path/domain dari wp-config sudah di-set, fallback ke '/'
-    setcookie('hrissq_token', $token, time() + HOUR_IN_SECONDS, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''), is_ssl(), true);
+    setcookie(
+      'hrissq_token',
+      $token,
+      time() + (12 * HOUR_IN_SECONDS),
+      (defined('COOKIEPATH') ? COOKIEPATH : '/'),
+      (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''),
+      is_ssl(),
+      true
+    );
     return $token;
   }
 
@@ -33,39 +45,44 @@ class Auth {
     $nip = trim(strval($nip));
     $plain_pass = trim(strval($plain_pass));
     if ($nip === '' || $plain_pass === '') {
-      return ['ok'=>false, 'msg'=>'NIP & Password wajib diisi'];
+      return ['ok'=>false, 'msg'=>'Akun & Pasword wajib diisi'];
     }
 
     $u = self::get_user_by_nip($nip);
-    if (!$u) return ['ok'=>false, 'msg'=>'NIP tidak ditemukan'];
+    if (!$u) return ['ok'=>false, 'msg'=>'Akun tidak ditemukan'];
 
-    // 1) Jika password di DB ada dan terlihat hash -> verifikasi hash
+    $passOk = false;
+
+    // 1) Jika kolom password terisi hash, tetap hormati hash tersebut.
     if (!empty($u->password)) {
       $hash = $u->password;
       $looksHashed = (strpos($hash, '$2y$') === 0 || strpos($hash, '$argon2') === 0);
 
-      if ($looksHashed) {
-        if (!password_verify($plain_pass, $hash)) {
-          return ['ok'=>false, 'msg'=>'Password salah'];
-        }
-      } else {
-        // password tersimpan plain-text -> bandingkan langsung (disarankan migrasi ke hash)
-        if ($plain_pass !== $hash) {
-          // fallback ke no_hp kalau ternyata password kolom tidak dipakai
-          if (self::norm_phone($plain_pass) !== self::norm_phone($u->no_hp)) {
-            return ['ok'=>false, 'msg'=>'Password salah'];
-          }
-        }
-      }
-    } else {
-      // 2) Kolom password kosong -> default = nomor HP
-      if (self::norm_phone($plain_pass) !== self::norm_phone($u->no_hp)) {
-        return ['ok'=>false, 'msg'=>'Belum ada password. Gunakan nomor HP sebagai password awal.'];
+      if ($looksHashed && password_verify($plain_pass, $hash)) {
+        $passOk = true;
+      } elseif (!$looksHashed && hash_equals(strval($hash), $plain_pass)) {
+        $passOk = true;
       }
     }
 
+    // 2) Validasi utama mengikuti instruksi terbaru: pasword = nomor HP.
+    if (!$passOk) {
+      $dbPhone  = self::norm_phone($u->no_hp ?? '');
+      $inputPhone = self::norm_phone($plain_pass);
+
+      if ($dbPhone !== '' && $inputPhone !== '' && hash_equals($dbPhone, $inputPhone)) {
+        $passOk = true;
+      } elseif (hash_equals(trim(strval($u->no_hp ?? '')), $plain_pass)) {
+        $passOk = true;
+      }
+    }
+
+    if (!$passOk) {
+      return ['ok'=>false, 'msg'=>'Pasword salah. Gunakan nomor HP sebagai pasword.'];
+    }
+
     // sukses → set session
-    self::set_session_for($u->id);
+    self::set_session_for($u->nip);
 
     return [
       'ok'   => true,
@@ -84,6 +101,8 @@ class Auth {
       $token = sanitize_text_field($_COOKIE['hrissq_token']);
       delete_transient('hrissq_sess_' . $token);
       setcookie('hrissq_token', '', time() - 3600, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''), is_ssl(), true);
+      setcookie('hrissq_token', '', time() - 3600, '/', '', is_ssl(), true);
+      unset($_COOKIE['hrissq_token']);
     }
     return true;
   }
@@ -91,11 +110,21 @@ class Auth {
   public static function current_user(){
     if (empty($_COOKIE['hrissq_token'])) return null;
     $token  = sanitize_text_field($_COOKIE['hrissq_token']);
-    $userId = get_transient('hrissq_sess_' . $token);
-    if (!$userId) return null;
+    $sess   = get_transient('hrissq_sess_' . $token);
+    if (!$sess) return null;
 
-    global $wpdb;
-    $t = $wpdb->prefix . 'hrissq_users';
-    return $wpdb->get_row($wpdb->prepare("SELECT * FROM $t WHERE id = %d", $userId));
+    $nip = null;
+    if (is_array($sess) && !empty($sess['nip'])) {
+      $nip = $sess['nip'];
+    } elseif (is_object($sess) && !empty($sess->nip)) {
+      $nip = $sess->nip;
+    } elseif (is_string($sess) && trim($sess) !== '') {
+      // kompatibilitas lama ketika yang disimpan adalah ID numerik / string biasa
+      $nip = $sess;
+    }
+
+    if (!$nip) return null;
+
+    return self::get_user_by_nip($nip);
   }
 }
