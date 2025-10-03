@@ -13,7 +13,14 @@
         if (k !== 'action' && k !== '_nonce') fd.append(k, body[k]);
       });
       return fetch(url, { method: 'POST', credentials: 'same-origin', body: fd })
-        .then(r => r.json());
+        .then(r => {
+          if (!r.ok) throw new Error('Network response: ' + r.status);
+          return r.json();
+        })
+        .catch(err => {
+          console.error('AJAX error:', err);
+          throw err;
+        });
     } else {
       const fd = new URLSearchParams();
       fd.append('action', action);
@@ -24,7 +31,15 @@
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
         body: fd.toString()
-      }).then(r => r.json());
+      })
+        .then(r => {
+          if (!r.ok) throw new Error('Network response: ' + r.status);
+          return r.json();
+        })
+        .catch(err => {
+          console.error('AJAX error:', err);
+          throw err;
+        });
     }
   }
 
@@ -54,18 +69,24 @@
       const pwv = (form.pw.value || '').trim();
       if (!nip || !pwv) { msg.textContent = 'Akun & Pasword wajib diisi.'; return; }
 
+      console.log('Submitting login:', { nip, ajax_url: (window.HRISSQ && HRISSQ.ajax) });
+
       ajax('hrissq_login', { nip, pw: pwv })
         .then(res => {
+          console.log('Login response:', res);
           if (!res || !res.ok) {
             msg.textContent = (res && res.msg) ? res.msg : 'Login gagal.';
             return;
           }
           // server sudah mengirim res.redirect → pakai itu
           const dashSlug = (window.HRISSQ && HRISSQ.dashboardSlug) ? HRISSQ.dashboardSlug : 'dashboard';
-          window.location.href = res.redirect || ('/' + dashSlug.replace(/^\/+/, '') + '/');
+          const redirectUrl = res.redirect || ('/' + dashSlug.replace(/^\/+/, '') + '/');
+          console.log('Redirecting to:', redirectUrl);
+          window.location.href = redirectUrl;
         })
         .catch(err => {
-          msg.textContent = 'Error: ' + (err && err.message ? err.message : err);
+          console.error('Login error:', err);
+          msg.textContent = 'Error: ' + (err && err.message ? err.message : String(err));
         });
     });
 

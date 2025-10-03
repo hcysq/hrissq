@@ -28,16 +28,35 @@ class Auth {
     $token = wp_generate_uuid4();
     // simpan maks 12 jam supaya user tetap login lebih lama
     set_transient('hrissq_sess_'.$token, ['nip' => $nip], 12 * HOUR_IN_SECONDS);
-    // path/domain dari wp-config sudah di-set, fallback ke '/'
-    setcookie(
-      'hrissq_token',
-      $token,
-      time() + (12 * HOUR_IN_SECONDS),
-      (defined('COOKIEPATH') ? COOKIEPATH : '/'),
-      (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''),
-      is_ssl(),
-      true
-    );
+
+    // Gunakan domain root (contoh: .sabilulquran.or.id) agar cookie bekerja di semua subdomain
+    $domain = '';
+    if (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) {
+      $domain = COOKIE_DOMAIN;
+    } else {
+      // Ambil domain root dari hostname
+      $host = parse_url(home_url(), PHP_URL_HOST);
+      if ($host) {
+        // Ekstrak domain root (contoh: login.sabilulquran.or.id -> .sabilulquran.or.id)
+        $parts = explode('.', $host);
+        if (count($parts) >= 2) {
+          $domain = '.' . $parts[count($parts) - 2] . '.' . $parts[count($parts) - 1];
+        }
+      }
+    }
+
+    // Set cookie dengan SameSite=Lax untuk kompatibilitas lebih baik
+    $options = [
+      'expires'  => time() + (12 * HOUR_IN_SECONDS),
+      'path'     => '/',
+      'domain'   => $domain,
+      'secure'   => is_ssl(),
+      'httponly' => true,
+      'samesite' => 'Lax'
+    ];
+
+    hrissq_log("Setting cookie for NIP={$nip}, domain={$domain}, secure=" . (is_ssl() ? 'true' : 'false'));
+    setcookie('hrissq_token', $token, $options);
     return $token;
   }
 
@@ -100,8 +119,31 @@ class Auth {
     if (!empty($_COOKIE['hrissq_token'])) {
       $token = sanitize_text_field($_COOKIE['hrissq_token']);
       delete_transient('hrissq_sess_' . $token);
-      setcookie('hrissq_token', '', time() - 3600, (defined('COOKIEPATH') ? COOKIEPATH : '/'), (defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : ''), is_ssl(), true);
-      setcookie('hrissq_token', '', time() - 3600, '/', '', is_ssl(), true);
+
+      // Hapus cookie dengan domain yang sama seperti saat set
+      $domain = '';
+      if (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) {
+        $domain = COOKIE_DOMAIN;
+      } else {
+        $host = parse_url(home_url(), PHP_URL_HOST);
+        if ($host) {
+          $parts = explode('.', $host);
+          if (count($parts) >= 2) {
+            $domain = '.' . $parts[count($parts) - 2] . '.' . $parts[count($parts) - 1];
+          }
+        }
+      }
+
+      $options = [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'domain'   => $domain,
+        'secure'   => is_ssl(),
+        'httponly' => true,
+        'samesite' => 'Lax'
+      ];
+
+      setcookie('hrissq_token', '', $options);
       unset($_COOKIE['hrissq_token']);
     }
     return true;

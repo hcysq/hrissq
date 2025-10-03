@@ -54,10 +54,17 @@ public static function forgot_password(){
     $nip = sanitize_text_field($_POST['nip'] ?? '');
     $pw  = sanitize_text_field($_POST['pw']  ?? '');
 
+    hrissq_log("Login attempt: NIP={$nip}");
+
     $res = Auth::login($nip, $pw);
+
     if ($res['ok']) {
       $res['redirect'] = trailingslashit(site_url('/' . HRISSQ_DASHBOARD_SLUG));
+      hrissq_log("Login success: NIP={$nip}, redirect={$res['redirect']}");
+    } else {
+      hrissq_log("Login failed: NIP={$nip}, msg={$res['msg']}");
     }
+
     wp_send_json($res);
   }
 
