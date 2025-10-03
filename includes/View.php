@@ -26,14 +26,13 @@ class View {
             <button type="button" id="hrissq-eye" class="eye">lihat</button>
           </div>
 
-          <button type="submit" class="btn-primary">Masuk</button>
-
+          <form id="hrissq-login-form" class="auth-form">
+            <label>Akun <span class="req">*</span></label>
+            <input type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
           <button type="button" id="hrissq-forgot" class="link-forgot">Lupa pasword?</button>
           <div class="msg" aria-live="polite"></div>
         </form>
       </div>
-    </div>
-
     <!-- Modal Lupa Password -->
     <div id="hrissq-modal" class="modal-backdrop" style="display:none;">
       <div class="modal">
@@ -45,7 +44,6 @@ class View {
           <button type="button" class="btn-light" id="hrissq-cancel">Batal</button>
           <button type="button" class="btn-primary" id="hrissq-send">Kirim</button>
         </div>
-        <div id="hrissq-forgot-msg" class="modal-msg"></div>
       </div>
     </div>
     <?php
@@ -69,7 +67,6 @@ class View {
       }
       return '';
     };
-
     $unit    = $resolve(['unit','unit_kerja','unitkerja','unitkerja_nama']);
     $jabatan = $resolve(['jabatan','posisi','position']);
     $hp      = $resolve(['no_hp','hp','telepon','phone']);
@@ -291,16 +288,17 @@ class View {
       </main>
     </div>
 
-    <!-- Modal Auto-Logout (Idle) -->
-    <div id="hrq-idle-backdrop" class="modal-backdrop" style="display:none;">
-      <div class="modal">
-        <h3>Sesi Akan Berakhir</h3>
-        <p>Anda tidak aktif cukup lama. Otomatis keluar dalam
-          <b><span id="hrq-idle-count">30</span> detik</b>.
-        </p>
-        <div class="modal-actions">
-          <button id="hrq-idle-stay" class="btn-light">Batalkan</button>
-          <button id="hrq-idle-exit" class="btn-primary">Keluar Sekarang</button>
+      <!-- Modal Auto-Logout (Idle) -->
+      <div id="hrq-idle-backdrop" class="modal-backdrop" style="display:none;">
+        <div class="modal">
+          <h3>Sesi Akan Berakhir</h3>
+          <p>Anda tidak aktif cukup lama. Otomatis keluar dalam
+            <b><span id="hrq-idle-count">30</span> detik</b>.
+          </p>
+          <div class="modal-actions">
+            <button id="hrq-idle-stay" class="btn-light">Batalkan</button>
+            <button id="hrq-idle-exit" class="btn-primary">Keluar Sekarang</button>
+          </div>
         </div>
       </div>
     </div>
@@ -317,48 +315,50 @@ class View {
     wp_enqueue_script('hrissq');
 
     ob_start(); ?>
-    <div class="hrissq-form-wrap">
-      <h2>Form Riwayat Pelatihan</h2>
-      <p>Lengkapi data pelatihan yang telah Anda ikuti.</p>
+    <div id="hrissq-app" class="hrissq-app">
+      <div class="hrissq-form-wrap">
+        <h2>Form Riwayat Pelatihan</h2>
+        <p>Lengkapi data pelatihan yang telah Anda ikuti.</p>
 
-      <form id="hrissq-training-form" enctype="multipart/form-data" class="training-form">
-        <div class="form-group">
-          <label>Nama Pelatihan <span class="req">*</span></label>
-          <input type="text" name="nama_pelatihan" placeholder="Contoh: Workshop Laravel" required>
-        </div>
+        <form id="hrissq-training-form" enctype="multipart/form-data" class="training-form">
+          <div class="form-group">
+            <label>Nama Pelatihan <span class="req">*</span></label>
+            <input type="text" name="nama_pelatihan" placeholder="Contoh: Workshop Laravel" required>
+          </div>
 
-        <div class="form-group">
-          <label>Tahun <span class="req">*</span></label>
-          <input type="number" name="tahun" placeholder="2024" min="1990" max="2099" required>
-        </div>
+          <div class="form-group">
+            <label>Tahun <span class="req">*</span></label>
+            <input type="number" name="tahun" placeholder="2024" min="1990" max="2099" required>
+          </div>
 
-        <div class="form-group">
-          <label>Pembiayaan <span class="req">*</span></label>
-          <select name="pembiayaan" required>
-            <option value="">Pilih Pembiayaan</option>
-            <option value="mandiri">Mandiri</option>
-            <option value="yayasan">Yayasan</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Pembiayaan <span class="req">*</span></label>
+            <select name="pembiayaan" required>
+              <option value="">Pilih Pembiayaan</option>
+              <option value="mandiri">Mandiri</option>
+              <option value="yayasan">Yayasan</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label>Kategori <span class="req">*</span></label>
-          <select name="kategori" required>
-            <option value="">Pilih Kategori</option>
-            <option value="hard">Hard Skill</option>
-            <option value="soft">Soft Skill</option>
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Kategori <span class="req">*</span></label>
+            <select name="kategori" required>
+              <option value="">Pilih Kategori</option>
+              <option value="hard">Hard Skill</option>
+              <option value="soft">Soft Skill</option>
+            </select>
+          </div>
 
-        <div class="form-group">
-          <label>Upload Sertifikat (opsional)</label>
-          <input type="file" name="sertifikat" accept=".pdf,.jpg,.jpeg,.png">
-          <small>Format: PDF, JPG, PNG (max 5MB)</small>
-        </div>
+          <div class="form-group">
+            <label>Upload Sertifikat (opsional)</label>
+            <input type="file" name="sertifikat" accept=".pdf,.jpg,.jpeg,.png">
+            <small>Format: PDF, JPG, PNG (max 5MB)</small>
+          </div>
 
-        <button type="submit" class="btn-primary">Simpan</button>
-        <a href="<?= esc_url(site_url('/'.HRISSQ_DASHBOARD_SLUG)) ?>" class="btn-light">Batal</a>
-      </form>
+          <button type="submit" class="btn-primary">Simpan</button>
+          <a href="<?= esc_url(site_url('/'.HRISSQ_DASHBOARD_SLUG)) ?>" class="btn-light">Batal</a>
+        </form>
+      </div>
     </div>
     <?php
     return ob_get_clean();

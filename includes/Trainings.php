@@ -87,4 +87,29 @@ class Trainings {
   public static function get_webapp_url(){
     return get_option('hrissq_training_webapp_url', '');
   }
+
+  /**
+   * Generate signed web app link that carries encoded nip & nama payload.
+   */
+  public static function build_webapp_link($nip, $nama){
+    $base = self::get_webapp_url();
+    if (!$base) return '';
+
+    $payload = wp_json_encode([
+      'nip'  => strval($nip),
+      'nama' => strval($nama),
+    ]);
+
+    if (!$payload) return $base;
+
+    $encoded = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
+    $token   = hash_hmac('sha256', $encoded, wp_salt('hrissq-training-link'));
+
+    $url = add_query_arg([
+      'payload' => $encoded,
+      'token'   => $token,
+    ], $base);
+
+    return esc_url_raw($url);
+  }
 }
