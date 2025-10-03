@@ -166,17 +166,17 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 ### Struktur Data yang Dikirim:
 | Kolom | Deskripsi |
 |-------|-----------|
-| Timestamp | Waktu submit |
-| User ID | ID user di database |
-| NIP | NIP pegawai |
-| Nama | Nama pegawai |
-| Unit | Unit kerja |
-| Jabatan | Jabatan |
-| Nama Pelatihan | Nama pelatihan |
-| Tahun | Tahun pelatihan |
-| Pembiayaan | mandiri / yayasan |
-| Kategori | hard / soft |
-| File URL | URL file sertifikat (jika ada) |
+| Nama | Nama pegawai (otomatis dari akun yang login) |
+| Jabatan | Jabatan / posisi terakhir |
+| Unit Kerja | Unit / divisi pegawai |
+| Nama Pelatihan/Workshop/Seminar | Judul pelatihan yang diinput |
+| Tahun Penyelenggaraan | Tahun berlangsungnya pelatihan |
+| Pembiayaan | `mandiri` atau `yayasan` |
+| Kategori | `hard` atau `soft` |
+| Link Sertifikat/Bukti | Tautan file di Google Drive (atau URL asal jika upload gagal) |
+| Timestamp | Waktu submit (format `Y-m-d H:i:s`) |
+
+> **Catatan:** File sertifikat otomatis dipindahkan ke Google Drive folder `1Wpf6k5G21Zb4kAILYDL7jfCjyKZd55zp` dengan sub-folder per pegawai (`<NIP>-<Nama>`). Jika folder sudah ada maka file baru akan ditambahkan tanpa menimpa file lama.
 
 ---
 

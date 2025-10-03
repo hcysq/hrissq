@@ -7,6 +7,7 @@ class Trainings {
 
   const OPT_TRAINING_SHEET_ID = 'hrissq_training_sheet_id';
   const OPT_TRAINING_TAB_NAME = 'hrissq_training_tab_name';
+  const OPT_TRAINING_DRIVE_FOLDER_ID = 'hrissq_training_drive_folder_id';
 
   /** Simpan / Ambil config Google Sheet untuk training */
   public static function set_sheet_config($sheet_id, $tab_name = 'Data'){
@@ -15,11 +16,19 @@ class Trainings {
   }
 
   public static function get_sheet_id(){
-    return get_option(self::OPT_TRAINING_SHEET_ID, '');
+    return get_option(self::OPT_TRAINING_SHEET_ID, '1Ex3WqFgW-pkEg07-IopgIMyzcsZdirIcSEz4GRQ3UFQ');
   }
 
   public static function get_tab_name(){
     return get_option(self::OPT_TRAINING_TAB_NAME, 'Data');
+  }
+
+  public static function set_drive_folder_id($folder_id){
+    update_option(self::OPT_TRAINING_DRIVE_FOLDER_ID, sanitize_text_field($folder_id), false);
+  }
+
+  public static function get_drive_folder_id(){
+    return get_option(self::OPT_TRAINING_DRIVE_FOLDER_ID, '1Wpf6k5G21Zb4kAILYDL7jfCjyKZd55zp');
   }
 
   /** Submit training data ke Google Sheet via Apps Script Web App */
@@ -28,7 +37,7 @@ class Trainings {
     if (!$sheet_id) return ['ok'=>false,'msg'=>'Sheet ID belum dikonfigurasi'];
 
     // Data yang akan dikirim:
-    // user_id, nip, nama, unit, jabatan, nama_pelatihan, tahun, pembiayaan, kategori, file_url, timestamp
+    // nip, nama, jabatan, unit_kerja, nama_pelatihan, tahun_penyelenggaraan, pembiayaan, kategori, link_sertifikat, timestamp
 
     // Untuk mengirim ke Google Sheet, kita butuh:
     // 1. Apps Script Web App yang di-deploy sebagai "anyone can access"
@@ -39,9 +48,16 @@ class Trainings {
       return ['ok'=>false,'msg'=>'Web App URL belum dikonfigurasi'];
     }
 
+    $payload = [
+      'sheetId'       => $sheet_id,
+      'tabName'       => self::get_tab_name(),
+      'driveFolderId' => self::get_drive_folder_id(),
+      'entry'         => $data,
+    ];
+
     // Kirim data via POST
     $args = [
-      'body'    => json_encode($data),
+      'body'    => wp_json_encode($payload),
       'headers' => ['Content-Type' => 'application/json'],
       'timeout' => 30,
     ];
@@ -70,5 +86,30 @@ class Trainings {
 
   public static function get_webapp_url(){
     return get_option('hrissq_training_webapp_url', '');
+  }
+
+  /**
+   * Generate signed web app link that carries encoded nip & nama payload.
+   */
+  public static function build_webapp_link($nip, $nama){
+    $base = self::get_webapp_url();
+    if (!$base) return '';
+
+    $payload = wp_json_encode([
+      'nip'  => strval($nip),
+      'nama' => strval($nama),
+    ]);
+
+    if (!$payload) return $base;
+
+    $encoded = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
+    $token   = hash_hmac('sha256', $encoded, wp_salt('hrissq-training-link'));
+
+    $url = add_query_arg([
+      'payload' => $encoded,
+      'token'   => $token,
+    ], $base);
+
+    return esc_url_raw($url);
   }
 }
