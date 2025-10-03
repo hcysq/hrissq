@@ -158,6 +158,14 @@ class View {
     wp_enqueue_style('hrissq');
     wp_enqueue_script('hrissq');
 
+    $trainingFormBase = 'https://script.google.com/macros/s/AKfycbxReKFiKsW1BtDZufNNi4sCuazw5jjzUQ9iHDPylmm9ARuAudqsB6CmSI_2vNpng3uP/exec';
+    $trainingLink = sprintf(
+      '%s?nip=%s&nama=%s',
+      $trainingFormBase,
+      urlencode((string)($me->nip ?? '')),
+      urlencode((string)($me->nama ?? ''))
+    );
+
     ob_start(); ?>
     <div class="hrissq-dashboard" id="hrissq-dashboard">
 
@@ -273,7 +281,7 @@ class View {
             <article class="hrissq-card">
               <h3 class="hrissq-card-title">Pengumuman</h3>
               <ul class="hrissq-bullet-list">
-                <li><strong>Pembaruan Data Pegawai</strong> – <a href="<?= esc_url(site_url('/'.HRISSQ_FORM_SLUG)) ?>" target="_blank">Isi form pelatihan terbaru</a>.</li>
+                <li><strong>Pembaruan Data Pegawai</strong> – <a href="<?= esc_url($trainingLink) ?>" target="_blank" rel="noopener">Isi form pelatihan terbaru</a>.</li>
                 <li><strong>SPMB 2026/2027</strong> – <a href="https://ppdb.sabilulquran.or.id" target="_blank" rel="noopener">Pendaftaran telah dibuka</a>.</li>
                 <li><strong>Ikuti Sabilul Qur'an di Instagram</strong> – <a href="https://instagram.com/sabilulquran" target="_blank" rel="noopener">@sabilulquran</a>.</li>
               </ul>
