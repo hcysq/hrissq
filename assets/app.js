@@ -94,17 +94,24 @@
     const forgotBtn = document.getElementById('hrissq-forgot');
     const backdrop = document.getElementById('hrissq-modal');
     const cancelBtn = document.getElementById('hrissq-cancel');
+    const closeBtn = document.getElementById('hrissq-close-modal');
     const sendBtn = document.getElementById('hrissq-send');
     const npInput = document.getElementById('hrissq-nip-forgot');
     const fMsg = document.getElementById('hrissq-forgot-msg');
 
     if (forgotBtn && backdrop) {
+      const closeModal = () => {
+        backdrop.style.display = 'none';
+        if (fMsg) { fMsg.className = 'modal-msg'; fMsg.textContent = ''; }
+      };
+
       forgotBtn.onclick = () => {
         backdrop.style.display = 'flex';
         if (npInput) npInput.value = (form.nip.value || '').trim();
         if (fMsg) { fMsg.className = 'modal-msg'; fMsg.textContent = ''; }
       };
-      cancelBtn && (cancelBtn.onclick = () => { backdrop.style.display = 'none'; });
+      cancelBtn && (cancelBtn.onclick = closeModal);
+      closeBtn && (closeBtn.onclick = closeModal);
       sendBtn && (sendBtn.onclick = () => {
         const nip = (npInput.value || '').trim();
         if (!nip) { fMsg.textContent = 'Akun wajib diisi.'; return; }
@@ -116,7 +123,7 @@
             if (res && res.ok) {
               fMsg.className = 'modal-msg ok';
               fMsg.textContent = 'Permintaan terkirim. Anda akan dihubungi Admin via WhatsApp.';
-              setTimeout(() => { backdrop.style.display = 'none'; }, 1500);
+              setTimeout(closeModal, 1500);
             } else {
               fMsg.className = 'modal-msg';
               fMsg.textContent = 'Gagal mengirim permintaan. Coba lagi.';

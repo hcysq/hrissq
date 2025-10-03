@@ -17,26 +17,25 @@ class View {
         </div>
 
         <form id="hrissq-login-form" class="auth-form">
-          <label>Akun <span class="req">*</span></label>
-          <input type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
+          <label for="hrissq-nip">Akun <span class="req">*</span></label>
+          <input id="hrissq-nip" type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
 
-          <label>Pasword <span class="req">*</span></label>
+          <label for="hrissq-pw">Pasword <span class="req">*</span></label>
           <div class="pw-row">
             <input id="hrissq-pw" type="password" name="pw" placeholder="Gunakan No HP" autocomplete="current-password" required>
             <button type="button" id="hrissq-eye" class="eye">lihat</button>
           </div>
 
-          <form id="hrissq-login-form" class="auth-form">
-            <label>Akun <span class="req">*</span></label>
-            <input type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
+          <button type="submit" class="btn-primary">Masuk</button>
           <button type="button" id="hrissq-forgot" class="link-forgot">Lupa pasword?</button>
           <div class="msg" aria-live="polite"></div>
         </form>
       </div>
     <!-- Modal Lupa Password -->
-    <div id="hrissq-modal" class="modal-backdrop" style="display:none;">
+    <div id="hrissq-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="hrissq-forgot-title">
       <div class="modal">
-        <h3>Lupa Pasword</h3>
+        <button type="button" class="modal-close" id="hrissq-close-modal" aria-label="Tutup">×</button>
+        <h3 id="hrissq-forgot-title">Lupa Pasword</h3>
         <p>Masukkan Akun (NIP) Anda. Kami akan mengirim permintaan ke Admin HCM.</p>
         <label>Akun (NIP)</label>
         <input id="hrissq-nip-forgot" type="text" placeholder="Masukkan NIP">
@@ -44,6 +43,7 @@ class View {
           <button type="button" class="btn-light" id="hrissq-cancel">Batal</button>
           <button type="button" class="btn-primary" id="hrissq-send">Kirim</button>
         </div>
+        <div id="hrissq-forgot-msg" class="modal-msg" aria-live="polite"></div>
       </div>
     </div>
     <?php
