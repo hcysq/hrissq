@@ -150,6 +150,15 @@ Plugin menggunakan WP-Cron untuk sinkronisasi otomatis:
 - `hrissq_profiles_cron` - Import profil pegawai (daily)
 - `hrissq_users_cron` - Import data users (daily)
 
+## Training Sheet Styling
+
+Di **Tools → HCIS.YSQ Settings → Training**, tersedia opsi untuk menyesuaikan tampilan sheet Google:
+
+- **Column Widths** – JSON object berisi pasangan "Judul Kolom" : lebar pixel. Kosongkan untuk memakai default dari script.
+- **Header Font Size** – angka poin (pt) untuk judul kolom. Kosongkan untuk kembali ke default 12pt.
+
+Nilai ini dikirim ke Apps Script setiap kali data baru masuk sehingga format header tetap konsisten meski sheet diedit manual.
+
 ## StarSender Integration
 
 Untuk fitur "Lupa Password", plugin mengirim pesan ke Admin HCM via WhatsApp menggunakan StarSender API.

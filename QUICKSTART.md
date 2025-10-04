@@ -35,7 +35,11 @@ Tab Name: User
 Sheet ID: 1Ex3WqFgW-pkEg07-IopgIMyzcsZdirIcSEz4GRQ3UFQ
 Tab Name: Data
 Web App URL: [Paste URL dari Apps Script deployment]
+Column Widths (opsional): {"Nama":220,"Jabatan":180,"Unit Kerja":200}
+Header Font Size (opsional): 12
 ```
+
+> **Tip:** Field Column Widths dan Header Font Size boleh dikosongkan jika ingin memakai nilai default dari script.
 
 ### 3. Deploy Google Apps Script
 

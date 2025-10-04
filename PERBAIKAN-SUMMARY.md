@@ -105,6 +105,9 @@
 - Description untuk upload file
 - Button Cancel dengan link ke dashboard
 
+✅ **Trainings.php** & Admin Settings:
+- Menambahkan opsi styling sheet (column widths & header font size) yang tersimpan di WordPress dan dikirim ke Apps Script.
+
 ✅ **app.css** (assets/app.css):
 - Style baru untuk `.hrissq-form-wrap`
 - Style untuk `.training-form`

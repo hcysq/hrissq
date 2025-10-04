@@ -23,7 +23,7 @@
   - Unified settings page "HCIS.YSQ Settings" untuk semua konfigurasi
   - Section 1: Profil Pegawai (CSV URL)
   - Section 2: Users (Sheet ID + Tab Name)
-  - Section 3: Training (Sheet ID + Tab Name + Web App URL)
+  - Section 3: Training (Sheet ID + Tab Name + Web App URL + styling options)
   - Manual import button untuk setiap section
 
 - **Cron Jobs**
@@ -51,6 +51,7 @@
   - Added `bootTrainingForm()` function untuk handle submit form
   - Fixed redirect URL menggunakan slug dari PHP config
   - Improved error handling
+  - Added column width & header font customization hook untuk Google Sheet payload
 
 - **CSS**
   - Added `.hrissq-form-wrap` dan `.training-form` styles

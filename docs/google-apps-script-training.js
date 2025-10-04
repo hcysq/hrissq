@@ -26,8 +26,8 @@ const REQUIRED_HEADERS = [
   'Timestamp',
 ];
 
-// Pengaturan tampilan kolom di Sheet Google Training
-const COLUMN_WIDTHS = {
+// Pengaturan tampilan kolom di Sheet Google Training (dapat dioverride via payload.columnWidths)
+const DEFAULT_COLUMN_WIDTHS = {
   'Nama': 220,
   'Jabatan': 180,
   'Unit Kerja': 200,
@@ -38,7 +38,8 @@ const COLUMN_WIDTHS = {
   'Link Sertifikat/Bukti': 260,
   'Timestamp': 200,
 };
-const HEADER_FONT_SIZE = 12;
+// Default font header (payload.headerFontSize akan override jika disediakan)
+const DEFAULT_HEADER_FONT_SIZE = 12;
 
 function doPost(e) {
   try {
@@ -58,7 +59,10 @@ function doPost(e) {
       sheet = spreadsheet.insertSheet(tabName);
     }
 
-    ensureHeader(sheet);
+    const columnWidths = normalizeColumnWidths(payload.columnWidths);
+    const headerFontSize = normalizeHeaderFontSize(payload.headerFontSize);
+
+    ensureHeader(sheet, columnWidths, headerFontSize);
 
     const nama = (entry.nama || '').toString();
     const jabatan = (entry.jabatan || '').toString();
@@ -106,7 +110,7 @@ function doPost(e) {
   }
 }
 
-function ensureHeader(sheet) {
+function ensureHeader(sheet, columnWidths, headerFontSize) {
   const lastRow = sheet.getLastRow();
   if (lastRow === 0) {
     sheet.appendRow(REQUIRED_HEADERS);
@@ -119,26 +123,81 @@ function ensureHeader(sheet) {
     headerRange.setValues([REQUIRED_HEADERS]);
   }
 
-  applyHeaderStyle(headerRange);
-  applyColumnWidths(sheet);
+  applyHeaderStyle(headerRange, headerFontSize);
+  applyColumnWidths(sheet, columnWidths);
 }
 
-function applyHeaderStyle(range) {
+function applyHeaderStyle(range, headerFontSize) {
   range.setFontWeight('bold');
-  if (HEADER_FONT_SIZE && typeof HEADER_FONT_SIZE === 'number') {
-    range.setFontSize(HEADER_FONT_SIZE);
+  if (headerFontSize && typeof headerFontSize === 'number') {
+    range.setFontSize(headerFontSize);
   }
   range.setWrap(true);
 }
 
-function applyColumnWidths(sheet) {
+function applyColumnWidths(sheet, columnWidths) {
   REQUIRED_HEADERS.forEach((title, idx) => {
-    const width = COLUMN_WIDTHS[title];
+    const width = columnWidths[title];
     if (width && width > 0) {
       sheet.setColumnWidth(idx + 1, width);
     }
   });
   sheet.setFrozenRows(1);
+}
+
+function normalizeColumnWidths(input) {
+  const widths = Object.assign({}, DEFAULT_COLUMN_WIDTHS);
+
+  if (!input) {
+    return widths;
+  }
+
+  if (typeof input === 'string') {
+    try {
+      const parsed = JSON.parse(input);
+      if (parsed && typeof parsed === 'object') {
+        return normalizeColumnWidths(parsed);
+      }
+    } catch (err) {
+      return widths;
+    }
+    return widths;
+  }
+
+  if (Array.isArray(input)) {
+    input.forEach(item => {
+      if (!item || typeof item !== 'object') return;
+      const title = item.title || item.key || item.name;
+      const width = item.width || item.value;
+      if (!title) return;
+      const parsed = parsePositiveInt(width);
+      if (parsed) {
+        widths[title] = parsed;
+      }
+    });
+    return widths;
+  }
+
+  Object.keys(input).forEach(title => {
+    const parsed = parsePositiveInt(input[title]);
+    if (parsed) {
+      widths[title] = parsed;
+    }
+  });
+
+  return widths;
+}
+
+function normalizeHeaderFontSize(value) {
+  const parsed = parsePositiveInt(value);
+  return parsed || DEFAULT_HEADER_FONT_SIZE;
+}
+
+function parsePositiveInt(value) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return 0;
+  const rounded = Math.round(num);
+  return rounded > 0 ? rounded : 0;
 }
 
 function uploadFileToDrive(url, rootFolderId, nip, nama, pelatihan) {

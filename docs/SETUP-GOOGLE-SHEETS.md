@@ -153,7 +153,24 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
    - Sheet ID: `1Ex3WqFgW-pkEg07-IopgIMyzcsZdirIcSEz4GRQ3UFQ`
    - Tab Name: `Data`
    - Web App URL: (paste URL dari step C.5)
+   - Column Widths (opsional): masukkan JSON `{ "Nama": 220, "Jabatan": 180, ... }`
+   - Header Font Size (opsional): angka (mis. `12`)
    - Klik **Simpan**
+
+### G. Menyesuaikan Tampilan Kolom Sheet
+
+1. **Column Widths** – isi dengan JSON object yang memetakan judul kolom ke lebar (pixel). Contoh:
+   ```json
+   {
+     "Nama": 220,
+     "Jabatan": 180,
+     "Unit Kerja": 200,
+     "Nama Pelatihan/Workshop/Seminar": 320,
+     "Link Sertifikat/Bukti": 260
+   }
+   ```
+   Kosongkan untuk memakai ukuran default.
+2. **Header Font Size** – angka satuan poin (pt). Kosongkan untuk menggunakan default script (12pt).
 
 ### F. Test Submit Form:
 

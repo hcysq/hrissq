@@ -56,6 +56,8 @@ class Admin {
         $tab_name = sanitize_text_field($_POST['training_tab_name'] ?? 'Data');
         $webapp_url = esc_url_raw($_POST['training_webapp_url'] ?? '');
         $drive_folder = sanitize_text_field($_POST['training_drive_folder_id'] ?? '');
+        $widths_input = isset($_POST['training_column_widths']) ? wp_unslash($_POST['training_column_widths']) : '';
+        $header_font = $_POST['training_header_font_size'] ?? '';
 
         Trainings::set_sheet_config($sheet_id, $tab_name);
         Trainings::set_webapp_url($webapp_url);
@@ -63,6 +65,23 @@ class Admin {
           Trainings::set_drive_folder_id($drive_folder);
         } else {
           delete_option(Trainings::OPT_TRAINING_DRIVE_FOLDER_ID);
+        }
+
+        $width_error = null;
+        $widths_saved = Trainings::set_column_widths_from_input($widths_input, $width_error);
+        if ($widths_saved === null) {
+          $msg .= '<strong>Training column widths GAGAL:</strong> ' . esc_html($width_error) . '<br>';
+        } elseif (!empty($widths_saved)) {
+          $msg .= '<strong>Training column widths disimpan (' . count($widths_saved) . ' kolom).</strong><br>';
+        } else {
+          $msg .= '<strong>Training column widths dikosongkan (menggunakan default script).</strong><br>';
+        }
+
+        $font_saved = Trainings::set_header_font_size($header_font);
+        if ($font_saved > 0) {
+          $msg .= '<strong>Header font size:</strong> ' . intval($font_saved) . '<br>';
+        } else {
+          $msg .= '<strong>Header font size:</strong> default Apps Script digunakan.<br>';
         }
 
         $msg .= "<strong>Training config saved.</strong><br>";
@@ -76,6 +95,8 @@ class Admin {
     $training_tab_name = esc_attr(Trainings::get_tab_name());
     $training_drive_folder = esc_attr(Trainings::get_drive_folder_id());
     $training_webapp_url = esc_url(Trainings::get_webapp_url());
+    $training_column_widths = esc_textarea(Trainings::get_column_widths_display());
+    $training_header_font = esc_attr(Trainings::get_header_font_size());
     ?>
     <div class="wrap">
       <h1>HCIS.YSQ • Settings & Import</h1>
@@ -158,6 +179,20 @@ class Admin {
               <input type="text" id="training_drive_folder_id" name="training_drive_folder_id" class="regular-text" style="width: 600px"
                      value="<?= $training_drive_folder ?>" placeholder="1Wpf6k5G21Zb4kAILYDL7jfCjyKZd55zp">
               <p class="description">File sertifikat akan disimpan di folder Google Drive ini (sub-folder otomatis: <code>&lt;NIP&gt;-&lt;Nama&gt;</code>).</p>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><label for="training_column_widths">Column Widths</label></th>
+            <td>
+              <textarea id="training_column_widths" name="training_column_widths" class="large-text code" rows="5" placeholder='{"Nama":220,"Jabatan":180}'><?= $training_column_widths ?></textarea>
+              <p class="description">Gunakan JSON object dengan judul kolom sebagai key. Kosongkan untuk memakai default Apps Script.</p>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><label for="training_header_font_size">Header Font Size</label></th>
+            <td>
+              <input type="number" id="training_header_font_size" name="training_header_font_size" class="small-text" min="8" max="36" value="<?= $training_header_font ?>">
+              <p class="description">Ukuran font (pt) untuk judul kolom. Kosongkan untuk default (12pt).</p>
             </td>
           </tr>
           <tr>
