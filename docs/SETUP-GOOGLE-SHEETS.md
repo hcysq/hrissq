@@ -46,7 +46,7 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 ### Konfigurasi di WordPress:
 
 1. Login ke WordPress Admin
-2. Buka **Tools → HRISSQ Settings**
+2. Buka **Tools → HCIS.YSQ Settings**
 3. Di section **"1. Profil Pegawai (CSV)"**:
    - Paste URL CSV
    - Klik **Simpan**
@@ -90,7 +90,7 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 
 ### Konfigurasi di WordPress:
 
-1. Buka **Tools → HRISSQ Settings**
+1. Buka **Tools → HCIS.YSQ Settings**
 2. Di section **"2. Users (Google Sheet)"**:
    - Sheet ID: `14Uf7pjsFVURLmL5NWXlWhYvoILrwdiW11y3sVOLrLt4`
    - Tab Name: `User`
@@ -148,7 +148,7 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 
 ### E. Konfigurasi di WordPress:
 
-1. Buka **Tools → HRISSQ Settings**
+1. Buka **Tools → HCIS.YSQ Settings**
 2. Di section **"3. Training Form → Google Sheet"**:
    - Sheet ID: `1Ex3WqFgW-pkEg07-IopgIMyzcsZdirIcSEz4GRQ3UFQ`
    - Tab Name: `Data`

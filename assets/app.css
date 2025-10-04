@@ -152,12 +152,14 @@ p{margin:0 0 6px}
 
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:12px;z-index:50}
-.modal{background:rgba(255,255,255,.95);border-radius:14px;max-width:360px;width:100%;padding:16px;border:1px solid rgba(15,23,42,.2);color:#0f172a;backdrop-filter:blur(16px)}
+.modal{position:relative;background:rgba(255,255,255,.95);border-radius:14px;max-width:360px;width:100%;padding:16px 16px 18px;border:1px solid rgba(15,23,42,.2);color:#0f172a;backdrop-filter:blur(16px)}
 .modal h3{margin:0 0 6px;font-size:var(--font-heading);font-weight:700}
 .modal p{font-size:var(--font-body)}
 .modal .modal-actions{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
 .modal input{width:100%;padding:9px 12px;border:1px solid rgba(15,23,42,.25);border-radius:10px;background:rgba(255,255,255,.9);color:#0f172a;font-size:11px}
 .modal-msg{margin-top:6px;font-size:10px}
+.modal-close{position:absolute;top:10px;right:10px;background:transparent;border:none;font-size:18px;line-height:1;color:rgba(15,23,42,.6);cursor:pointer;padding:0;width:26px;height:26px;border-radius:50%;transition:background .2s ease,color .2s ease}
+.modal-close:hover{background:rgba(15,23,42,.08);color:rgba(15,23,42,.85)}
 
 /* Training Form */
 .hrissq-form-wrap{
