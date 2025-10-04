@@ -151,19 +151,14 @@ add_action('init', function () {
 add_filter('the_content', function ($content) {
   if (empty($content)) return $content;
 
-  // Replace shortcode dengan titik ke underscore
-  $replacements = [
-    '[hcis.ysq_login]'       => '[hcis_ysq_login]',
-    '[hcis.ysq_dashboard]'   => '[hcis_ysq_dashboard]',
-    '[hcis.ysq_form]'        => '[hcis_ysq_form]',
-    '[hcis.ysq_form_button]' => '[hcis_ysq_form_button]',
-  ];
-
-  foreach ($replacements as $old => $new) {
-    if (strpos($content, $old) !== false) {
-      $content = str_replace($old, $new, $content);
-    }
-  }
+  // Ganti seluruh variasi shortcode hcis.ysq_* (termasuk atribut / self closing)
+  $pattern = '/\[(\/?)hcis\.ysq_([a-z0-9_-]+)([^\]]*)\]/i';
+  $content = preg_replace_callback($pattern, function ($matches) {
+    $prefix = $matches[1] === '/' ? '[/' : '[';
+    $tag    = 'hcis_ysq_' . $matches[2];
+    $attrs  = $matches[3] ?? '';
+    return $prefix . $tag . $attrs . ']';
+  }, $content);
 
   return $content;
 }, 9); // Priority 9 agar dijalankan sebelum do_shortcode (10)
@@ -193,8 +188,10 @@ add_action('wp_enqueue_scripts', function () {
   }
 
   // Check juga shortcode dengan titik (sebelum filter)
-  foreach (['hcis.ysq_login', 'hcis.ysq_dashboard', 'hcis.ysq_form'] as $tag) {
-    if (strpos($post->post_content, '[' . $tag . ']') !== false) {
+  $dotShortcodes = ['hcis.ysq_login', 'hcis.ysq_dashboard', 'hcis.ysq_form'];
+  foreach ($dotShortcodes as $tag) {
+    $regex = '/\[\/?' . preg_quote($tag, '/') . '(?:\b[^\]]*)?\]/i';
+    if (preg_match($regex, $post->post_content)) {
       $has_shortcode = true;
       break;
     }
