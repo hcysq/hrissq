@@ -20,7 +20,7 @@
   - `Trainings.php` - Handle submit training ke Google Sheet
 
 - **New Admin Page**
-  - Unified settings page "HRISSQ Settings" untuk semua konfigurasi
+  - Unified settings page "HCIS.YSQ Settings" untuk semua konfigurasi
   - Section 1: Profil Pegawai (CSV URL)
   - Section 2: Users (Sheet ID + Tab Name)
   - Section 3: Training (Sheet ID + Tab Name + Web App URL)

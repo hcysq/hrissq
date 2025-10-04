@@ -8,7 +8,7 @@
  * 4. Deploy → New deployment → Web app
  *    - Execute as: Me
  *    - Who has access: Anyone
- * 5. Copy URL dan paste ke HRISSQ Settings → Training → Web App URL
+ * 5. Copy URL dan paste ke HCIS.YSQ Settings → Training → Web App URL
  */
 
 const DEFAULT_SHEET_ID = '1Ex3WqFgW-pkEg07-IopgIMyzcsZdirIcSEz4GRQ3UFQ';
