@@ -2,7 +2,7 @@
 /**
  * Plugin Name: HCIS YSQ (hcis.ysq)
  * Description: Login NIP+HP, Dashboard Pegawai, Form Pelatihan dengan Google Sheets Integration + SSO ke Google Apps Script.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: samijaya
  */
 
@@ -39,7 +39,7 @@ hcisysq_log('hcis.ysq plugin boot...');
 /* =======================================================
  *  Konstanta plugin
  * ======================================================= */
-if (!defined('HCISYSQ_VER')) define('HCISYSQ_VER', '1.1.0');
+if (!defined('HCISYSQ_VER')) define('HCISYSQ_VER', '1.1.1');
 if (!defined('HCISYSQ_DIR')) define('HCISYSQ_DIR', plugin_dir_path(__FILE__));
 if (!defined('HCISYSQ_URL')) define('HCISYSQ_URL', plugin_dir_url(__FILE__));
 
@@ -99,12 +99,33 @@ add_action('init', function () {
     'dashboardSlug' => HCISYSQ_DASHBOARD_SLUG,
   ]);
 
-  // shortcodes bawaan
+  // === Shortcodes (valid WordPress naming: A-Za-z0-9_-) ===
+  // Shortcode baru (underscore valid)
+  add_shortcode('hcis_ysq_login',     ['HCISYSQ\\View', 'login']);
+  add_shortcode('hcis_ysq_dashboard', ['HCISYSQ\\View', 'dashboard']);
+  add_shortcode('hcis_ysq_form',      ['HCISYSQ\\View', 'form']);
+
+  // Alias shortcode lama untuk kompatibilitas mundur
+  add_shortcode('hrissq_login',     ['HCISYSQ\\View', 'login']);
+  add_shortcode('hrissq_dashboard', ['HCISYSQ\\View', 'dashboard']);
+  add_shortcode('hrissq_form',      ['HCISYSQ\\View', 'form']);
+
+  // Alias tanpa underscore untuk kenyamanan
   add_shortcode('hcisysq_login',     ['HCISYSQ\\View', 'login']);
   add_shortcode('hcisysq_dashboard', ['HCISYSQ\\View', 'dashboard']);
   add_shortcode('hcisysq_form',      ['HCISYSQ\\View', 'form']);
 
   // **Shortcode tombol redirect ke GAS (SSO)**
+  add_shortcode('hcis_ysq_form_button', function(){
+    if (!is_user_logged_in() && !HCISYSQ\Auth::current_user()) {
+      $login = trailingslashit(home_url('/' . HCISYSQ_LOGIN_SLUG));
+      return '<a class="button" href="'.esc_url($login).'">Login untuk isi form</a>';
+    }
+    $href = admin_url('admin-post.php?action=hcisysq_go');
+    return '<a class="button button-primary" href="'.esc_url($href).'">Isi Form Pelatihan</a>';
+  });
+
+  // Alias lama
   add_shortcode('hcisysq_form_button', function(){
     if (!is_user_logged_in() && !HCISYSQ\Auth::current_user()) {
       $login = trailingslashit(home_url('/' . HCISYSQ_LOGIN_SLUG));
@@ -113,7 +134,82 @@ add_action('init', function () {
     $href = admin_url('admin-post.php?action=hcisysq_go');
     return '<a class="button button-primary" href="'.esc_url($href).'">Isi Form Pelatihan</a>';
   });
+  add_shortcode('hrissq_form_button', function(){
+    if (!is_user_logged_in() && !HCISYSQ\Auth::current_user()) {
+      $login = trailingslashit(home_url('/' . HCISYSQ_LOGIN_SLUG));
+      return '<a class="button" href="'.esc_url($login).'">Login untuk isi form</a>';
+    }
+    $href = admin_url('admin-post.php?action=hcisysq_go');
+    return '<a class="button button-primary" href="'.esc_url($href).'">Isi Form Pelatihan</a>';
+  });
 });
+
+/* =======================================================
+ *  Filter konten: auto-replace shortcode dengan titik (invalid)
+ *  [hcis.ysq_*] → [hcis_ysq_*] on-the-fly (tanpa edit DB)
+ * ======================================================= */
+add_filter('the_content', function ($content) {
+  if (empty($content)) return $content;
+
+  // Replace shortcode dengan titik ke underscore
+  $replacements = [
+    '[hcis.ysq_login]'       => '[hcis_ysq_login]',
+    '[hcis.ysq_dashboard]'   => '[hcis_ysq_dashboard]',
+    '[hcis.ysq_form]'        => '[hcis_ysq_form]',
+    '[hcis.ysq_form_button]' => '[hcis_ysq_form_button]',
+  ];
+
+  foreach ($replacements as $old => $new) {
+    if (strpos($content, $old) !== false) {
+      $content = str_replace($old, $new, $content);
+    }
+  }
+
+  return $content;
+}, 9); // Priority 9 agar dijalankan sebelum do_shortcode (10)
+
+/* =======================================================
+ *  Conditional asset enqueue (hanya saat shortcode dipakai)
+ * ======================================================= */
+add_action('wp_enqueue_scripts', function () {
+  if (!is_singular()) return;
+
+  global $post;
+  if (!$post || empty($post->post_content)) return;
+
+  // Daftar shortcode yang memerlukan assets
+  $shortcodes = [
+    'hcis_ysq_login', 'hcis_ysq_dashboard', 'hcis_ysq_form',
+    'hcisysq_login', 'hcisysq_dashboard', 'hcisysq_form',
+    'hrissq_login', 'hrissq_dashboard', 'hrissq_form'
+  ];
+
+  $has_shortcode = false;
+  foreach ($shortcodes as $tag) {
+    if (has_shortcode($post->post_content, $tag)) {
+      $has_shortcode = true;
+      break;
+    }
+  }
+
+  // Check juga shortcode dengan titik (sebelum filter)
+  foreach (['hcis.ysq_login', 'hcis.ysq_dashboard', 'hcis.ysq_form'] as $tag) {
+    if (strpos($post->post_content, '[' . $tag . ']') !== false) {
+      $has_shortcode = true;
+      break;
+    }
+  }
+
+  if (!$has_shortcode) return;
+
+  // Enqueue assets
+  if (wp_style_is('hcisysq', 'registered')) {
+    wp_enqueue_style('hcisysq');
+  }
+  if (wp_script_is('hcisysq', 'registered')) {
+    wp_enqueue_script('hcisysq');
+  }
+}, 10);
 
 /* =======================================================
  *  AJAX endpoints

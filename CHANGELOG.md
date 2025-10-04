@@ -71,3 +71,34 @@
   - Dashboard pegawai
   - Form pelatihan
   - MySQL storage
+
+## [1.1.1] - 2025-10-04
+
+### Fixed
+- Memperbaiki shortcode yang menggunakan titik (.) yang tidak valid di WordPress
+  - `[hcis.ysq_login]` sekarang otomatis dikonversi ke `[hcis_ysq_login]`
+  - `[hcis.ysq_dashboard]` → `[hcis_ysq_dashboard]`
+  - `[hcis.ysq_form]` → `[hcis_ysq_form]`
+
+### Added
+- Shortcode baru dengan naming yang valid:
+  - `[hcis_ysq_login]` - Halaman login
+  - `[hcis_ysq_dashboard]` - Dashboard pegawai
+  - `[hcis_ysq_form]` - Form pelatihan
+  - `[hcis_ysq_form_button]` - Tombol form
+- Alias shortcode lama untuk kompatibilitas mundur:
+  - `[hrissq_login]`, `[hrissq_dashboard]`, `[hrissq_form]`
+  - `[hcisysq_login]`, `[hcisysq_dashboard]`, `[hcisysq_form]`
+- Filter otomatis yang mengkonversi shortcode dengan titik tanpa mengubah database
+- Conditional asset loading - CSS/JS hanya dimuat saat shortcode digunakan
+
+### Changed
+- Semua referensi dari `hrissq` ke `hcis.ysq` / `hcisysq`
+- Namespace dari `HRISSQ` ke `HCISYSQ`
+- Nama tabel database dari `hrissq_*` ke `hcisysq_*`
+- File plugin utama dari `hrissq.php` ke `hcis.ysq.php`
+
+### Notes
+- Tidak ada perubahan database diperlukan
+- Halaman dengan `[hcis.ysq_login]` akan otomatis berfungsi tanpa perlu edit manual
+- Semua shortcode lama tetap berfungsi untuk kompatibilitas
