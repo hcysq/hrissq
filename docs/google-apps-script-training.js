@@ -8,7 +8,7 @@
  * 4. Deploy → New deployment → Web app
  *    - Execute as: Me
  *    - Who has access: Anyone
- * 5. Copy URL dan paste ke HRISSQ Settings → Training → Web App URL
+ * 5. Copy URL dan paste ke HCIS.YSQ Settings → Training → Web App URL
  */
 
 const DEFAULT_SHEET_ID = '1Ex3WqFgW-pkEg07-IopgIMyzcsZdirIcSEz4GRQ3UFQ';
@@ -25,6 +25,20 @@ const REQUIRED_HEADERS = [
   'Link Sertifikat/Bukti',
   'Timestamp',
 ];
+
+// Pengaturan tampilan kolom di Sheet Google Training
+const COLUMN_WIDTHS = {
+  'Nama': 220,
+  'Jabatan': 180,
+  'Unit Kerja': 200,
+  'Nama Pelatihan/Workshop/Seminar': 320,
+  'Tahun Penyelenggaraan': 160,
+  'Pembiayaan': 140,
+  'Kategori': 140,
+  'Link Sertifikat/Bukti': 260,
+  'Timestamp': 200,
+};
+const HEADER_FONT_SIZE = 12;
 
 function doPost(e) {
   try {
@@ -96,14 +110,35 @@ function ensureHeader(sheet) {
   const lastRow = sheet.getLastRow();
   if (lastRow === 0) {
     sheet.appendRow(REQUIRED_HEADERS);
-    return;
   }
+
   const headerRange = sheet.getRange(1, 1, 1, REQUIRED_HEADERS.length);
   const current = headerRange.getValues()[0];
   const mismatch = REQUIRED_HEADERS.some((title, idx) => (current[idx] || '') !== title);
   if (mismatch) {
     headerRange.setValues([REQUIRED_HEADERS]);
   }
+
+  applyHeaderStyle(headerRange);
+  applyColumnWidths(sheet);
+}
+
+function applyHeaderStyle(range) {
+  range.setFontWeight('bold');
+  if (HEADER_FONT_SIZE && typeof HEADER_FONT_SIZE === 'number') {
+    range.setFontSize(HEADER_FONT_SIZE);
+  }
+  range.setWrap(true);
+}
+
+function applyColumnWidths(sheet) {
+  REQUIRED_HEADERS.forEach((title, idx) => {
+    const width = COLUMN_WIDTHS[title];
+    if (width && width > 0) {
+      sheet.setColumnWidth(idx + 1, width);
+    }
+  });
+  sheet.setFrozenRows(1);
 }
 
 function uploadFileToDrive(url, rootFolderId, nip, nama, pelatihan) {

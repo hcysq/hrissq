@@ -1,4 +1,4 @@
-# Quick Start Guide - HRIS SQ Plugin
+# Quick Start Guide - HCIS.YSQ Plugin
 
 ## Instalasi Cepat
 
@@ -13,7 +13,7 @@ wp plugin activate hrissq
 
 ### 2. Konfigurasi Awal
 
-Login ke WordPress Admin → **Tools → HRISSQ Settings**
+Login ke WordPress Admin → **Tools → HCIS.YSQ Settings**
 
 #### A. Profil Pegawai (CSV)
 ```
@@ -45,7 +45,7 @@ Web App URL: [Paste URL dari Apps Script deployment]
 4. **Deploy → New deployment → Web app**
    - Execute as: Me
    - Who has access: Anyone
-5. Copy URL → Paste ke HRISSQ Settings
+5. Copy URL → Paste ke HCIS.YSQ Settings
 
 ### 4. Buat Halaman WordPress
 
@@ -87,7 +87,7 @@ Buat 3 halaman baru dengan shortcode:
 ## Troubleshooting Cepat
 
 ### Login Gagal
-- Cek data users sudah di-import (`Tools → HRISSQ Settings → Import Users`)
+- Cek data users sudah di-import (`Tools → HCIS.YSQ Settings → Import Users`)
 - Pastikan NIP benar
 - Password default = No HP (62xxx)
 

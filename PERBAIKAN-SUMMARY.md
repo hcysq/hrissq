@@ -1,4 +1,4 @@
-# Summary Perbaikan Plugin HRISSQ v1.0.3
+# Summary Perbaikan Plugin HCIS.YSQ v1.0.3
 
 ## Tanggal: 2025-10-01
 
@@ -233,7 +233,7 @@
 Jika ada masalah:
 1. Cek log: `wp-content/hrissq.log`
 2. Cek dokumentasi: `README.md` dan `docs/`
-3. Test manual via `Tools → HRISSQ Settings`
+3. Test manual via `Tools → HCIS.YSQ Settings`
 4. Hubungi developer
 
 ---

@@ -1,4 +1,4 @@
-# Project Structure - HRIS SQ Plugin
+# Project Structure - HCIS.YSQ Plugin
 
 ```
 hrissq/
@@ -61,7 +61,7 @@ hrissq/
 ### Includes
 
 #### Admin.php
-- Menu: `Tools → HRISSQ Settings`
+- Menu: `Tools → HCIS.YSQ Settings`
 - 3 sections:
   1. Profil Pegawai (CSV URL)
   2. Users (Sheet ID + Tab)

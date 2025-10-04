@@ -5,6 +5,39 @@ if (!defined('ABSPATH')) exit;
 
 class Auth {
 
+  private static function determine_cookie_domain(){
+    if (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) {
+      return COOKIE_DOMAIN;
+    }
+
+    $host = parse_url(home_url(), PHP_URL_HOST);
+    if (!$host) return '';
+
+    $host = strtolower(trim($host));
+    $host = trim($host, '.');
+    if ($host === '') return '';
+
+    $parts = explode('.', $host);
+    if (count($parts) === 1) {
+      return $host;
+    }
+
+    $suffix = implode('.', array_slice($parts, -2));
+    $twoLevelTlds = apply_filters('hrissq_two_level_tlds', [
+      'co.id','or.id','ac.id','go.id','sch.id','net.id','web.id','my.id','biz.id','mil.id','ponpes.id'
+    ]);
+
+    if (in_array($suffix, $twoLevelTlds, true) && count($parts) >= 3) {
+      $domainParts = array_slice($parts, -3);
+    } else {
+      $domainParts = array_slice($parts, -2);
+    }
+
+    $domain = '.' . implode('.', $domainParts);
+
+    return apply_filters('hrissq_cookie_domain', $domain, $host);
+  }
+
   // normalisasi no HP: keep digits only, leading 0 -> 62
   public static function norm_phone($s){
     $s = preg_replace('/\D+/', '', strval($s));
@@ -29,21 +62,8 @@ class Auth {
     // simpan maks 12 jam supaya user tetap login lebih lama
     set_transient('hrissq_sess_'.$token, ['nip' => $nip], 12 * HOUR_IN_SECONDS);
 
-    // Gunakan domain root (contoh: .sabilulquran.or.id) agar cookie bekerja di semua subdomain
-    $domain = '';
-    if (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) {
-      $domain = COOKIE_DOMAIN;
-    } else {
-      // Ambil domain root dari hostname
-      $host = parse_url(home_url(), PHP_URL_HOST);
-      if ($host) {
-        // Ekstrak domain root (contoh: login.sabilulquran.or.id -> .sabilulquran.or.id)
-        $parts = explode('.', $host);
-        if (count($parts) >= 2) {
-          $domain = '.' . $parts[count($parts) - 2] . '.' . $parts[count($parts) - 1];
-        }
-      }
-    }
+    // Gunakan domain root (contoh: hcis.sabilulquran.or.id -> .sabilulquran.or.id) agar cookie bekerja di semua subdomain
+    $domain = self::determine_cookie_domain();
 
     // Set cookie dengan SameSite=Lax untuk kompatibilitas lebih baik
     $options = [
@@ -121,18 +141,7 @@ class Auth {
       delete_transient('hrissq_sess_' . $token);
 
       // Hapus cookie dengan domain yang sama seperti saat set
-      $domain = '';
-      if (defined('COOKIE_DOMAIN') && COOKIE_DOMAIN) {
-        $domain = COOKIE_DOMAIN;
-      } else {
-        $host = parse_url(home_url(), PHP_URL_HOST);
-        if ($host) {
-          $parts = explode('.', $host);
-          if (count($parts) >= 2) {
-            $domain = '.' . $parts[count($parts) - 2] . '.' . $parts[count($parts) - 1];
-          }
-        }
-      }
+      $domain = self::determine_cookie_domain();
 
       $options = [
         'expires'  => time() - 3600,

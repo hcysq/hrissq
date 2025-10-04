@@ -28,7 +28,7 @@ public static function forgot_password(){
   $nama = $emp ? $emp->nama : '(NIP tidak terdaftar)';
 
   // rakit pesan
-  $message = "Permintaan reset pasword HRIS SQ\nAkun (NIP): {$nip}\nNama: {$nama}";
+  $message = "Permintaan reset pasword HCIS.YSQ\nAkun (NIP): {$nip}\nNama: {$nama}";
 
   // panggil StarSender (form-encoded + header apikey)
   $args = [

@@ -1,5 +1,5 @@
 -- Migration Script: v1.0.2 to v1.0.3
--- HRIS SQ Plugin
+-- HCIS.YSQ Plugin
 -- Date: 2025-10-01
 
 -- WARNING: Backup database sebelum menjalankan script ini!
