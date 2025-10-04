@@ -8,7 +8,7 @@
 # Atau via WordPress Admin: Plugins → Add New → Upload Plugin
 
 # Aktivasi plugin
-wp plugin activate hrissq
+wp plugin activate hcisysq
 ```
 
 ### 2. Konfigurasi Awal
@@ -53,17 +53,17 @@ Buat 3 halaman baru dengan shortcode:
 
 #### Halaman Login (slug: `masuk`)
 ```
-[hrissq_login]
+[hcisysq_login]
 ```
 
 #### Dashboard (slug: `dashboard`)
 ```
-[hrissq_dashboard]
+[hcisysq_dashboard]
 ```
 
 #### Form Pelatihan (slug: `pelatihan`)
 ```
-[hrissq_form]
+[hcisysq_form]
 ```
 
 ### 5. Test Login
@@ -127,7 +127,7 @@ Contoh:
 1. Customize tema/style sesuai branding
 2. Setup SSL untuk keamanan
 3. Backup database secara berkala
-4. Monitor log: `wp-content/hrissq.log`
+4. Monitor log: `wp-content/hcisysq.log`
 
 ---
 
@@ -136,6 +136,6 @@ Contoh:
 - Documentation: `README.md`
 - Setup Guide: `docs/SETUP-GOOGLE-SHEETS.md`
 - Changelog: `CHANGELOG.md`
-- Log file: `wp-content/hrissq.log`
+- Log file: `wp-content/hcisysq.log`
 
 Jika ada masalah, hubungi developer atau cek log error.

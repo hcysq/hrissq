@@ -1,5 +1,5 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
@@ -23,7 +23,7 @@ class Auth {
     }
 
     $suffix = implode('.', array_slice($parts, -2));
-    $twoLevelTlds = apply_filters('hrissq_two_level_tlds', [
+    $twoLevelTlds = apply_filters('hcisysq_two_level_tlds', [
       'co.id','or.id','ac.id','go.id','sch.id','net.id','web.id','my.id','biz.id','mil.id','ponpes.id'
     ]);
 
@@ -35,7 +35,7 @@ class Auth {
 
     $domain = '.' . implode('.', $domainParts);
 
-    return apply_filters('hrissq_cookie_domain', $domain, $host);
+    return apply_filters('hcisysq_cookie_domain', $domain, $host);
   }
 
   // normalisasi no HP: keep digits only, leading 0 -> 62
@@ -46,21 +46,21 @@ class Auth {
     return $s;
   }
 
-  /** Ambil user by NIP dari wpw3_hrissq_users */
+  /** Ambil user by NIP dari wpw3_hcisysq_users */
   public static function get_user_by_nip($nip){
     global $wpdb;
-    $t = $wpdb->prefix . 'hrissq_users';
+    $t = $wpdb->prefix . 'hcisysq_users';
     return $wpdb->get_row($wpdb->prepare("SELECT * FROM $t WHERE nip = %s", $nip));
   }
 
   /**
    * Set session (token disimpan di transient + cookie browser)
-   * Kita simpan NIP karena tabel hrissq_users tidak memiliki kolom ID integer.
+   * Kita simpan NIP karena tabel hcisysq_users tidak memiliki kolom ID integer.
    */
   private static function set_session_for($nip){
     $token = wp_generate_uuid4();
     // simpan maks 12 jam supaya user tetap login lebih lama
-    set_transient('hrissq_sess_'.$token, ['nip' => $nip], 12 * HOUR_IN_SECONDS);
+    set_transient('hcisysq_sess_'.$token, ['nip' => $nip], 12 * HOUR_IN_SECONDS);
 
     // Gunakan domain root (contoh: hcis.sabilulquran.or.id -> .sabilulquran.or.id) agar cookie bekerja di semua subdomain
     $domain = self::determine_cookie_domain();
@@ -75,8 +75,8 @@ class Auth {
       'samesite' => 'Lax'
     ];
 
-    hrissq_log("Setting cookie for NIP={$nip}, domain={$domain}, secure=" . (is_ssl() ? 'true' : 'false'));
-    setcookie('hrissq_token', $token, $options);
+    hcisysq_log("Setting cookie for NIP={$nip}, domain={$domain}, secure=" . (is_ssl() ? 'true' : 'false'));
+    setcookie('hcisysq_token', $token, $options);
     return $token;
   }
 
@@ -136,9 +136,9 @@ class Auth {
   }
 
   public static function logout(){
-    if (!empty($_COOKIE['hrissq_token'])) {
-      $token = sanitize_text_field($_COOKIE['hrissq_token']);
-      delete_transient('hrissq_sess_' . $token);
+    if (!empty($_COOKIE['hcisysq_token'])) {
+      $token = sanitize_text_field($_COOKIE['hcisysq_token']);
+      delete_transient('hcisysq_sess_' . $token);
 
       // Hapus cookie dengan domain yang sama seperti saat set
       $domain = self::determine_cookie_domain();
@@ -152,16 +152,16 @@ class Auth {
         'samesite' => 'Lax'
       ];
 
-      setcookie('hrissq_token', '', $options);
-      unset($_COOKIE['hrissq_token']);
+      setcookie('hcisysq_token', '', $options);
+      unset($_COOKIE['hcisysq_token']);
     }
     return true;
   }
 
   public static function current_user(){
-    if (empty($_COOKIE['hrissq_token'])) return null;
-    $token  = sanitize_text_field($_COOKIE['hrissq_token']);
-    $sess   = get_transient('hrissq_sess_' . $token);
+    if (empty($_COOKIE['hcisysq_token'])) return null;
+    $token  = sanitize_text_field($_COOKIE['hcisysq_token']);
+    $sess   = get_transient('hcisysq_sess_' . $token);
     if (!$sess) return null;
 
     $nip = null;

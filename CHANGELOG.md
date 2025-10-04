@@ -27,8 +27,8 @@
   - Manual import button untuk setiap section
 
 - **Cron Jobs**
-  - `hrissq_profiles_cron` - Auto-sync profil pegawai harian
-  - `hrissq_users_cron` - Auto-sync users harian
+  - `hcisysq_profiles_cron` - Auto-sync profil pegawai harian
+  - `hcisysq_users_cron` - Auto-sync users harian
 
 - **Documentation**
   - `README.md` - Dokumentasi lengkap plugin
@@ -37,9 +37,9 @@
 
 ### Changed
 - **Database Structure**
-  - Renamed table `hrissq_employees` → `hrissq_users` untuk konsistensi
-  - Updated foreign key di `hrissq_trainings` dari `employee_id` → `user_id`
-  - Added column `password` di `hrissq_users`
+  - Renamed table `hcisysq_employees` → `hcisysq_users` untuk konsistensi
+  - Updated foreign key di `hcisysq_trainings` dari `employee_id` → `user_id`
+  - Added column `password` di `hcisysq_users`
 
 - **Form UI**
   - Improved training form UI dengan styling yang lebih baik
@@ -53,7 +53,7 @@
   - Improved error handling
 
 - **CSS**
-  - Added `.hrissq-form-wrap` dan `.training-form` styles
+  - Added `.hcisysq-form-wrap` dan `.training-form` styles
   - Added `.btn-light` style
   - Improved responsive design
 

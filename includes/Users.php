@@ -1,12 +1,12 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
 class Users {
 
-  const OPT_USERS_SHEET_ID = 'hrissq_users_sheet_id';
-  const OPT_USERS_TAB_NAME = 'hrissq_users_tab_name';
+  const OPT_USERS_SHEET_ID = 'hcisysq_users_sheet_id';
+  const OPT_USERS_TAB_NAME = 'hcisysq_users_tab_name';
 
   /** Simpan / Ambil config Google Sheet untuk users */
   public static function set_sheet_config($sheet_id, $tab_name = 'User'){
@@ -88,7 +88,7 @@ class Users {
     }
 
     global $wpdb;
-    $t = $wpdb->prefix.'hrissq_users';
+    $t = $wpdb->prefix.'hcisysq_users';
     $inserted = 0; $updated = 0;
 
     while (($row = fgetcsv($fh)) !== false) {

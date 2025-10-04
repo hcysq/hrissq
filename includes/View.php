@@ -1,5 +1,5 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
@@ -7,43 +7,43 @@ class View {
 
   /* ========== LOGIN PAGE ========== */
   public static function login(){
-    wp_enqueue_style('hrissq');
-    wp_enqueue_script('hrissq');
+    wp_enqueue_style('hcisysq');
+    wp_enqueue_script('hcisysq');
     ob_start(); ?>
-    <div class="hrissq-auth-wrap">
+    <div class="hcisysq-auth-wrap">
       <div class="auth-card">
         <div class="auth-header">
           <h2>Masuk ke Akun Guru/Pegawai</h2>
         </div>
 
-        <form id="hrissq-login-form" class="auth-form">
-          <label for="hrissq-nip">Akun <span class="req">*</span></label>
-          <input id="hrissq-nip" type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
+        <form id="hcisysq-login-form" class="auth-form">
+          <label for="hcisysq-nip">Akun <span class="req">*</span></label>
+          <input id="hcisysq-nip" type="text" name="nip" placeholder="Masukkan NIP" autocomplete="username" required>
 
-          <label for="hrissq-pw">Pasword <span class="req">*</span></label>
+          <label for="hcisysq-pw">Pasword <span class="req">*</span></label>
           <div class="pw-row">
-            <input id="hrissq-pw" type="password" name="pw" placeholder="Gunakan No HP" autocomplete="current-password" required>
-            <button type="button" id="hrissq-eye" class="eye">lihat</button>
+            <input id="hcisysq-pw" type="password" name="pw" placeholder="Gunakan No HP" autocomplete="current-password" required>
+            <button type="button" id="hcisysq-eye" class="eye">lihat</button>
           </div>
 
           <button type="submit" class="btn-primary">Masuk</button>
-          <button type="button" id="hrissq-forgot" class="link-forgot">Lupa pasword?</button>
+          <button type="button" id="hcisysq-forgot" class="link-forgot">Lupa pasword?</button>
           <div class="msg" aria-live="polite"></div>
         </form>
       </div>
     <!-- Modal Lupa Password -->
-    <div id="hrissq-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="hrissq-forgot-title">
+    <div id="hcisysq-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="hcisysq-forgot-title">
       <div class="modal">
-        <button type="button" class="modal-close" id="hrissq-close-modal" aria-label="Tutup">×</button>
-        <h3 id="hrissq-forgot-title">Lupa Pasword</h3>
+        <button type="button" class="modal-close" id="hcisysq-close-modal" aria-label="Tutup">×</button>
+        <h3 id="hcisysq-forgot-title">Lupa Pasword</h3>
         <p>Masukkan Akun (NIP) Anda. Kami akan mengirim permintaan ke Admin HCM.</p>
         <label>Akun (NIP)</label>
-        <input id="hrissq-nip-forgot" type="text" placeholder="Masukkan NIP">
+        <input id="hcisysq-nip-forgot" type="text" placeholder="Masukkan NIP">
         <div class="modal-actions">
-          <button type="button" class="btn-light" id="hrissq-cancel">Batal</button>
-          <button type="button" class="btn-primary" id="hrissq-send">Kirim</button>
+          <button type="button" class="btn-light" id="hcisysq-cancel">Batal</button>
+          <button type="button" class="btn-primary" id="hcisysq-send">Kirim</button>
         </div>
-        <div id="hrissq-forgot-msg" class="modal-msg" aria-live="polite"></div>
+        <div id="hcisysq-forgot-msg" class="modal-msg" aria-live="polite"></div>
       </div>
     </div>
     <?php
@@ -53,7 +53,7 @@ class View {
   /* ========== DASHBOARD PAGE ========== */
   public static function dashboard(){
     $me = Auth::current_user();
-    if (!$me) { wp_safe_redirect(site_url('/'.HRISSQ_LOGIN_SLUG)); exit; }
+    if (!$me) { wp_safe_redirect(site_url('/'.HCISYSQ_LOGIN_SLUG)); exit; }
     $resolve = function(array $keys) use ($me){
       foreach ($keys as $key) {
         if (!isset($me->$key)) continue;
@@ -152,8 +152,8 @@ class View {
       ['label' => 'Masa Kerja', 'value' => $masaKerja],
     ];
 
-    wp_enqueue_style('hrissq');
-    wp_enqueue_script('hrissq');
+    wp_enqueue_style('hcisysq');
+    wp_enqueue_script('hcisysq');
 
     $trainingFormBase = 'https://script.google.com/macros/s/AKfycbxReKFiKsW1BtDZufNNi4sCuazw5jjzUQ9iHDPylmm9ARuAudqsB6CmSI_2vNpng3uP/exec';
     $trainingLink = sprintf(
@@ -164,18 +164,18 @@ class View {
     );
 
     ob_start(); ?>
-    <div class="hrissq-dashboard" id="hrissq-dashboard">
+    <div class="hcisysq-dashboard" id="hcisysq-dashboard">
 
       <!-- Sidebar -->
-      <aside class="hrissq-sidebar" id="hrissq-sidebar" aria-label="Navigasi utama">
-        <div class="hrissq-sidebar-header">
-          <span class="hrissq-sidebar-logo">SQ Pegawai</span>
-          <button type="button" class="hrissq-icon-button hrissq-sidebar-close" id="hrissq-sidebar-close" aria-label="Tutup menu navigasi">
+      <aside class="hcisysq-sidebar" id="hcisysq-sidebar" aria-label="Navigasi utama">
+        <div class="hcisysq-sidebar-header">
+          <span class="hcisysq-sidebar-logo">SQ Pegawai</span>
+          <button type="button" class="hcisysq-icon-button hcisysq-sidebar-close" id="hcisysq-sidebar-close" aria-label="Tutup menu navigasi">
             <span aria-hidden="true">×</span>
           </button>
         </div>
-        <nav class="hrissq-sidebar-nav">
-          <a class="is-active" href="<?= esc_url(site_url('/'.HRISSQ_DASHBOARD_SLUG)) ?>">Dashboard</a>
+        <nav class="hcisysq-sidebar-nav">
+          <a class="is-active" href="<?= esc_url(site_url('/'.HCISYSQ_DASHBOARD_SLUG)) ?>">Dashboard</a>
           <a href="#">Profil</a>
           <a href="#">Slip Gaji</a>
           <a href="#">Rekap Absensi</a>
@@ -188,42 +188,42 @@ class View {
           <a href="#">Panduan</a>
           <a href="#">Support</a>
         </nav>
-        <div class="hrissq-sidebar-meta">
-          <span>Versi <?= esc_html(HRISSQ_VER) ?></span>
+        <div class="hcisysq-sidebar-meta">
+          <span>Versi <?= esc_html(HCISYSQ_VER) ?></span>
         </div>
       </aside>
 
-      <div class="hrissq-sidebar-overlay" id="hrissq-sidebar-overlay" aria-hidden="true"></div>
+      <div class="hcisysq-sidebar-overlay" id="hcisysq-sidebar-overlay" aria-hidden="true"></div>
 
       <!-- Main -->
-      <main class="hrissq-main">
-        <header class="hrissq-topbar">
-          <div class="hrissq-topbar-left">
-            <button type="button" class="hrissq-icon-button hrissq-menu-toggle" id="hrissq-sidebar-toggle" aria-label="Buka menu navigasi" aria-expanded="true">
+      <main class="hcisysq-main">
+        <header class="hcisysq-topbar">
+          <div class="hcisysq-topbar-left">
+            <button type="button" class="hcisysq-icon-button hcisysq-menu-toggle" id="hcisysq-sidebar-toggle" aria-label="Buka menu navigasi" aria-expanded="true">
               <span></span>
               <span></span>
               <span></span>
             </button>
             <div>
-              <h1 class="hrissq-page-title">Dashboard Pegawai</h1>
-              <p class="hrissq-page-subtitle">Ringkasan informasi kepegawaian</p>
+              <h1 class="hcisysq-page-title">Dashboard Pegawai</h1>
+              <p class="hcisysq-page-subtitle">Ringkasan informasi kepegawaian</p>
             </div>
           </div>
-          <div class="hrissq-user">
-            <div class="hrissq-user-meta">
-              <span class="hrissq-user-name"><?= esc_html($me->nama) ?></span>
-              <span class="hrissq-user-role">NIP: <?= esc_html($me->nip ?? '-') ?></span>
+          <div class="hcisysq-user">
+            <div class="hcisysq-user-meta">
+              <span class="hcisysq-user-name"><?= esc_html($me->nama) ?></span>
+              <span class="hcisysq-user-role">NIP: <?= esc_html($me->nip ?? '-') ?></span>
             </div>
-            <button type="button" class="btn-light" id="hrissq-logout">Keluar</button>
+            <button type="button" class="btn-light" id="hcisysq-logout">Keluar</button>
           </div>
         </header>
 
-        <div class="hrissq-main-body">
-          <section class="hrissq-card-grid hrissq-card-grid--2">
+        <div class="hcisysq-main-body">
+          <section class="hcisysq-card-grid hcisysq-card-grid--2">
             <!-- Kartu 1: Profil Ringkas -->
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Profil Ringkas</h3>
-              <dl class="hrissq-meta-list">
+            <article class="hcisysq-card">
+              <h3 class="hcisysq-card-title">Profil Ringkas</h3>
+              <dl class="hcisysq-meta-list">
                 <?php foreach ($profilRingkasRows as $row): ?>
                   <div>
                     <dt><?= esc_html($row['label']) ?></dt>
@@ -234,9 +234,9 @@ class View {
             </article>
 
             <!-- Kartu 2: Data Kepegawaian -->
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Data Kepegawaian</h3>
-              <dl class="hrissq-meta-list">
+            <article class="hcisysq-card">
+              <h3 class="hcisysq-card-title">Data Kepegawaian</h3>
+              <dl class="hcisysq-meta-list">
                 <?php foreach ($kepegawaianRows as $row): ?>
                   <div>
                     <dt><?= esc_html($row['label']) ?></dt>
@@ -248,8 +248,8 @@ class View {
           </section>
 
 
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Kontak Utama</h3>
+            <article class="hcisysq-card">
+              <h3 class="hcisysq-card-title">Kontak Utama</h3>
               <p>
                 <?php if ($contactLines): ?>
                   <?php foreach ($contactLines as $idx => $line): ?>
@@ -261,9 +261,9 @@ class View {
               </p>
             </article>
 
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Profil Ringkas</h3>
-              <dl class="hrissq-meta-list">
+            <article class="hcisysq-card">
+              <h3 class="hcisysq-card-title">Profil Ringkas</h3>
+              <dl class="hcisysq-meta-list">
                 <?php foreach ($profileRows as $row): ?>
                   <div>
                     <dt><?= esc_html($row['label']) ?></dt>
@@ -274,10 +274,10 @@ class View {
             </article>
           </section>
 
-          <section class="hrissq-card-grid hrissq-card-grid--1">
-            <article class="hrissq-card">
-              <h3 class="hrissq-card-title">Pengumuman</h3>
-              <ul class="hrissq-bullet-list">
+          <section class="hcisysq-card-grid hcisysq-card-grid--1">
+            <article class="hcisysq-card">
+              <h3 class="hcisysq-card-title">Pengumuman</h3>
+              <ul class="hcisysq-bullet-list">
                 <li><strong>Pembaruan Data Pegawai</strong> – <a href="<?= esc_url($trainingLink) ?>" target="_blank" rel="noopener">Isi form pelatihan terbaru</a>.</li>
                 <li><strong>SPMB 2026/2027</strong> – <a href="https://ppdb.sabilulquran.or.id" target="_blank" rel="noopener">Pendaftaran telah dibuka</a>.</li>
                 <li><strong>Ikuti Sabilul Qur'an di Instagram</strong> – <a href="https://instagram.com/sabilulquran" target="_blank" rel="noopener">@sabilulquran</a>.</li>
@@ -309,18 +309,18 @@ class View {
   /* ========== FORM PELATIHAN ========== */
   public static function form(){
     $me = Auth::current_user();
-    if (!$me) { wp_safe_redirect(site_url('/'.HRISSQ_LOGIN_SLUG)); exit; }
+    if (!$me) { wp_safe_redirect(site_url('/'.HCISYSQ_LOGIN_SLUG)); exit; }
 
-    wp_enqueue_style('hrissq');
-    wp_enqueue_script('hrissq');
+    wp_enqueue_style('hcisysq');
+    wp_enqueue_script('hcisysq');
 
     ob_start(); ?>
-    <div id="hrissq-app" class="hrissq-app">
-      <div class="hrissq-form-wrap">
+    <div id="hcisysq-app" class="hcisysq-app">
+      <div class="hcisysq-form-wrap">
         <h2>Form Riwayat Pelatihan</h2>
         <p>Lengkapi data pelatihan yang telah Anda ikuti.</p>
 
-        <form id="hrissq-training-form" enctype="multipart/form-data" class="training-form">
+        <form id="hcisysq-training-form" enctype="multipart/form-data" class="training-form">
           <div class="form-group">
             <label>Nama Pelatihan <span class="req">*</span></label>
             <input type="text" name="nama_pelatihan" placeholder="Contoh: Workshop Laravel" required>
@@ -356,7 +356,7 @@ class View {
           </div>
 
           <button type="submit" class="btn-primary">Simpan</button>
-          <a href="<?= esc_url(site_url('/'.HRISSQ_DASHBOARD_SLUG)) ?>" class="btn-light">Batal</a>
+          <a href="<?= esc_url(site_url('/'.HCISYSQ_DASHBOARD_SLUG)) ?>" class="btn-light">Batal</a>
         </form>
       </div>
     </div>

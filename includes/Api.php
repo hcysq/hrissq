@@ -1,5 +1,5 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
@@ -7,23 +7,23 @@ class Api {
 
   private static function check_nonce(){
     $nonce = $_POST['_nonce'] ?? '';
-    if (!wp_verify_nonce($nonce, 'hrissq-nonce')) {
+    if (!wp_verify_nonce($nonce, 'hcisysq-nonce')) {
       wp_send_json(['ok'=>false,'msg'=>'Invalid nonce']);
     }
   }
 
 public static function forgot_password(){
   // nonce
-  if (!isset($_POST['_nonce']) || !wp_verify_nonce($_POST['_nonce'],'hrissq-nonce')) {
+  if (!isset($_POST['_nonce']) || !wp_verify_nonce($_POST['_nonce'],'hcisysq-nonce')) {
     wp_send_json(['ok'=>false,'msg'=>'Invalid request']);
   }
 
   $nip = sanitize_text_field($_POST['nip'] ?? '');
   if (!$nip) wp_send_json(['ok'=>false,'msg'=>'Akun wajib diisi']);
 
-  // cari nama pegawai dari hrissq_users
+  // cari nama pegawai dari hcisysq_users
   global $wpdb;
-  $t = $wpdb->prefix.'hrissq_users';
+  $t = $wpdb->prefix.'hcisysq_users';
   $emp = $wpdb->get_row($wpdb->prepare("SELECT nama FROM $t WHERE nip=%s", $nip));
   $nama = $emp ? $emp->nama : '(NIP tidak terdaftar)';
 
@@ -32,11 +32,11 @@ public static function forgot_password(){
 
   // panggil StarSender (form-encoded + header apikey)
   $args = [
-    'headers' => [ 'apikey' => HRISSQ_SS_KEY ],
-    'body'    => [ 'tujuan' => HRISSQ_SS_HC, 'message' => $message ],
+    'headers' => [ 'apikey' => HCISYSQ_SS_KEY ],
+    'body'    => [ 'tujuan' => HCISYSQ_SS_HC, 'message' => $message ],
     'timeout' => 15,
   ];
-  $res = wp_remote_post(HRISSQ_SS_URL, $args);
+  $res = wp_remote_post(HCISYSQ_SS_URL, $args);
 
   if (is_wp_error($res)) {
     wp_send_json(['ok'=>false,'msg'=>'Gagal mengirim, coba lagi.']);
@@ -54,15 +54,15 @@ public static function forgot_password(){
     $nip = sanitize_text_field($_POST['nip'] ?? '');
     $pw  = sanitize_text_field($_POST['pw']  ?? '');
 
-    hrissq_log("Login attempt: NIP={$nip}");
+    hcisysq_log("Login attempt: NIP={$nip}");
 
     $res = Auth::login($nip, $pw);
 
     if ($res['ok']) {
-      $res['redirect'] = trailingslashit(site_url('/' . HRISSQ_DASHBOARD_SLUG));
-      hrissq_log("Login success: NIP={$nip}, redirect={$res['redirect']}");
+      $res['redirect'] = trailingslashit(site_url('/' . HCISYSQ_DASHBOARD_SLUG));
+      hcisysq_log("Login success: NIP={$nip}, redirect={$res['redirect']}");
     } else {
-      hrissq_log("Login failed: NIP={$nip}, msg={$res['msg']}");
+      hcisysq_log("Login failed: NIP={$nip}, msg={$res['msg']}");
     }
 
     wp_send_json($res);
@@ -115,7 +115,7 @@ public static function forgot_password(){
     }
 
     global $wpdb;
-    $t = $wpdb->prefix.'hrissq_trainings';
+    $t = $wpdb->prefix.'hcisysq_trainings';
     $wpdb->insert($t, [
       'user_id'        => intval($me->id),
       'nama_pelatihan' => $nama,

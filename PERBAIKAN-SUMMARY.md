@@ -23,7 +23,7 @@
 - Perbaikan flow logout dengan menghapus session sebelum redirect
 - Auto-logout setelah idle 15 menit dengan warning 30 detik
 
-✅ **hrissq.php**:
+✅ **hcisysq.php**:
 - Menambahkan `dashboardSlug` ke wp_localize_script untuk JavaScript
 
 ---
@@ -34,7 +34,7 @@
 
 ✅ **Sudah dikonfigurasi:**
 - URL CSV: `https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-ZlReqj_pfEfYGr5A87Wh6K2zU16iexLnfIh5djkrXzmVlk1w-/pub?gid=0&single=true&output=csv`
-- Auto-sync harian via WP-Cron (`hrissq_profiles_cron`)
+- Auto-sync harian via WP-Cron (`hcisysq_profiles_cron`)
 - Class `Profiles.php` sudah ada dan berfungsi
 
 ### B. Data Users
@@ -44,7 +44,7 @@
 - Sheet ID: `14Uf7pjsFVURLmL5NWXlWhYvoILrwdiW11y3sVOLrLt4`
 - Tab Name: `User`
 - Auto-hash password jika plain text
-- Auto-sync harian via WP-Cron (`hrissq_users_cron`)
+- Auto-sync harian via WP-Cron (`hcisysq_users_cron`)
 
 ✅ **Kolom yang diimport:**
 - NIP (wajib)
@@ -78,17 +78,17 @@
 ## 3. PERBAIKAN DATABASE
 
 ### Masalah Sebelumnya:
-- Inkonsistensi nama tabel (`hrissq_employees` vs `hrissq_users`)
+- Inkonsistensi nama tabel (`hcisysq_employees` vs `hcisysq_users`)
 - Kolom `password` belum ada di tabel users
 
 ### Solusi:
 
 ✅ **Installer.php** (includes/Installer.php):
-- Rename tabel `hrissq_employees` → `hrissq_users`
-- Tambah kolom `password` di tabel `hrissq_users`
-- Rename `employee_id` → `user_id` di tabel `hrissq_trainings`
+- Rename tabel `hcisysq_employees` → `hcisysq_users`
+- Tambah kolom `password` di tabel `hcisysq_users`
+- Rename `employee_id` → `user_id` di tabel `hcisysq_trainings`
 - Update foreign key constraint
-- Tambah cron job `hrissq_users_cron`
+- Tambah cron job `hcisysq_users_cron`
 
 ✅ **File Migration: docs/migration-v1.0.2-to-v1.0.3.sql**
 - SQL script untuk migrasi manual (jika diperlukan)
@@ -106,7 +106,7 @@
 - Button Cancel dengan link ke dashboard
 
 ✅ **app.css** (assets/app.css):
-- Style baru untuk `.hrissq-form-wrap`
+- Style baru untuk `.hcisysq-form-wrap`
 - Style untuk `.training-form`
 - Button styles (`.btn-primary`, `.btn-light`)
 - Responsive design
@@ -165,7 +165,7 @@
 ## FILE YANG DIUBAH/DIBUAT
 
 ### Modified:
-1. `hrissq.php` - Update version, includes, cron
+1. `hcisysq.php` - Update version, includes, cron
 2. `includes/Auth.php` - Perbaikan logout, cookie security
 3. `includes/Api.php` - Perbaikan forgot password, submit training
 4. `includes/View.php` - Perbaikan form pelatihan UI
@@ -231,7 +231,7 @@
 ## SUPPORT
 
 Jika ada masalah:
-1. Cek log: `wp-content/hrissq.log`
+1. Cek log: `wp-content/hcisysq.log`
 2. Cek dokumentasi: `README.md` dan `docs/`
 3. Test manual via `Tools → HCIS.YSQ Settings`
 4. Hubungi developer

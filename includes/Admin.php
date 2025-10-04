@@ -1,5 +1,5 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
@@ -9,7 +9,7 @@ class Admin {
       'HCIS.YSQ Settings',
       'HCIS.YSQ Settings',
       'manage_options',
-      'hrissq-settings',
+      'hcisysq-settings',
       [__CLASS__,'render']
     );
   }
@@ -20,7 +20,7 @@ class Admin {
     // handle POST
     $msg = '';
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-      check_admin_referer('hrissq_settings');
+      check_admin_referer('hcisysq_settings');
 
       // Profil Pegawai CSV
       if (isset($_POST['save_profiles']) || isset($_POST['import_profiles'])) {
@@ -86,7 +86,7 @@ class Admin {
       <!-- PROFIL PEGAWAI (CSV) -->
       <h2>1. Profil Pegawai (CSV)</h2>
       <form method="post">
-        <?php wp_nonce_field('hrissq_settings'); ?>
+        <?php wp_nonce_field('hcisysq_settings'); ?>
         <table class="form-table">
           <tr>
             <th scope="row"><label for="profiles_csv_url">CSV URL</label></th>
@@ -107,7 +107,7 @@ class Admin {
       <!-- USERS (Google Sheet) -->
       <h2>2. Users (Google Sheet)</h2>
       <form method="post">
-        <?php wp_nonce_field('hrissq_settings'); ?>
+        <?php wp_nonce_field('hcisysq_settings'); ?>
         <table class="form-table">
           <tr>
             <th scope="row"><label for="users_sheet_id">Sheet ID</label></th>
@@ -135,7 +135,7 @@ class Admin {
       <!-- TRAINING (Google Sheet) -->
       <h2>3. Training Form → Google Sheet</h2>
       <form method="post">
-        <?php wp_nonce_field('hrissq_settings'); ?>
+        <?php wp_nonce_field('hcisysq_settings'); ?>
         <table class="form-table">
           <tr>
             <th scope="row"><label for="training_sheet_id">Sheet ID</label></th>

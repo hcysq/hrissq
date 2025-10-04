@@ -1,13 +1,13 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
 class Trainings {
 
-  const OPT_TRAINING_SHEET_ID = 'hrissq_training_sheet_id';
-  const OPT_TRAINING_TAB_NAME = 'hrissq_training_tab_name';
-  const OPT_TRAINING_DRIVE_FOLDER_ID = 'hrissq_training_drive_folder_id';
+  const OPT_TRAINING_SHEET_ID = 'hcisysq_training_sheet_id';
+  const OPT_TRAINING_TAB_NAME = 'hcisysq_training_tab_name';
+  const OPT_TRAINING_DRIVE_FOLDER_ID = 'hcisysq_training_drive_folder_id';
 
   /** Simpan / Ambil config Google Sheet untuk training */
   public static function set_sheet_config($sheet_id, $tab_name = 'Data'){
@@ -43,7 +43,7 @@ class Trainings {
     // 1. Apps Script Web App yang di-deploy sebagai "anyone can access"
     // 2. URL dari Web App tersebut disimpan di options
 
-    $web_app_url = get_option('hrissq_training_webapp_url', '');
+    $web_app_url = get_option('hcisysq_training_webapp_url', '');
     if (!$web_app_url) {
       return ['ok'=>false,'msg'=>'Web App URL belum dikonfigurasi'];
     }
@@ -81,11 +81,11 @@ class Trainings {
 
   /** Set Web App URL */
   public static function set_webapp_url($url){
-    update_option('hrissq_training_webapp_url', esc_url_raw($url), false);
+    update_option('hcisysq_training_webapp_url', esc_url_raw($url), false);
   }
 
   public static function get_webapp_url(){
-    return get_option('hrissq_training_webapp_url', '');
+    return get_option('hcisysq_training_webapp_url', '');
   }
 
   /**
@@ -103,7 +103,7 @@ class Trainings {
     if (!$payload) return $base;
 
     $encoded = rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
-    $token   = hash_hmac('sha256', $encoded, wp_salt('hrissq-training-link'));
+    $token   = hash_hmac('sha256', $encoded, wp_salt('hcisysq-training-link'));
 
     $url = add_query_arg([
       'payload' => $encoded,

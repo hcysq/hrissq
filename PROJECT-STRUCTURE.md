@@ -1,8 +1,8 @@
 # Project Structure - HCIS.YSQ Plugin
 
 ```
-hrissq/
-├── hrissq.php                      # Main plugin file
+hcisysq/
+├── hcisysq.php                      # Main plugin file
 │
 ├── assets/
 │   ├── app.css                     # Styles untuk login, dashboard, form
@@ -33,7 +33,7 @@ hrissq/
 
 ### Root Files
 
-- **hrissq.php**: Main plugin file yang:
+- **hcisysq.php**: Main plugin file yang:
   - Define constants
   - Load semua includes
   - Register activation hooks
@@ -44,9 +44,9 @@ hrissq/
 ### Assets
 
 - **app.css**: Berisi styles untuk:
-  - Login page (`.hrissq-auth-wrap`)
-  - Dashboard layout (`.hrissq-dashboard`)
-  - Training form (`.hrissq-form-wrap`)
+  - Login page (`.hcisysq-auth-wrap`)
+  - Dashboard layout (`.hcisysq-dashboard`)
+  - Training form (`.hcisysq-form-wrap`)
   - Modal components
   - Responsive design
 
@@ -83,9 +83,9 @@ hrissq/
 
 #### Installer.php
 - Create 3 tables:
-  - `hrissq_users`: User data (auth)
-  - `hrissq_trainings`: Training records
-  - `hrissq_profiles`: Profile data (mirror dari CSV)
+  - `hcisysq_users`: User data (auth)
+  - `hcisysq_trainings`: Training records
+  - `hcisysq_profiles`: Profile data (mirror dari CSV)
 - Setup WP-Cron jobs
 
 #### Profiles.php
@@ -157,20 +157,20 @@ hrissq/
 
 ## Database Tables
 
-### wp_hrissq_users
+### wp_hcisysq_users
 ```sql
 id, nip, nama, jabatan, unit, no_hp, password, created_at, updated_at
 ```
 Primary: User authentication data
 
-### wp_hrissq_profiles
+### wp_hcisysq_profiles
 ```sql
 id, nip, nama, unit, jabatan, tempat_lahir, tanggal_lahir,
 alamat_ktp, desa, kecamatan, kota, kode_pos, email, hp, tmt, updated_at
 ```
 Mirror: Full profile data from CSV
 
-### wp_hrissq_trainings
+### wp_hcisysq_trainings
 ```sql
 id, user_id, nama_pelatihan, tahun, pembiayaan, kategori, file_url, created_at
 ```
@@ -178,35 +178,35 @@ Records: Training submissions
 
 ## Shortcodes
 
-- `[hrissq_login]` → Login page
-- `[hrissq_dashboard]` → Dashboard
-- `[hrissq_form]` → Training form
+- `[hcisysq_login]` → Login page
+- `[hcisysq_dashboard]` → Dashboard
+- `[hcisysq_form]` → Training form
 
 ## AJAX Actions
 
-- `hrissq_login` (nopriv) → Login
-- `hrissq_logout` (priv) → Logout
-- `hrissq_forgot` (nopriv) → Forgot password
-- `hrissq_submit_training` (priv) → Submit training
+- `hcisysq_login` (nopriv) → Login
+- `hcisysq_logout` (priv) → Logout
+- `hcisysq_forgot` (nopriv) → Forgot password
+- `hcisysq_submit_training` (priv) → Submit training
 
 ## WP-Cron Jobs
 
-- `hrissq_profiles_cron` → Daily import profiles
-- `hrissq_users_cron` → Daily import users
+- `hcisysq_profiles_cron` → Daily import profiles
+- `hcisysq_users_cron` → Daily import users
 
 ## Constants
 
 ```php
-HRISSQ_VER           // Plugin version
-HRISSQ_DIR           // Plugin directory path
-HRISSQ_URL           // Plugin URL
-HRISSQ_LOGIN_SLUG    // Login page slug (masuk)
-HRISSQ_DASHBOARD_SLUG // Dashboard slug (dashboard)
-HRISSQ_FORM_SLUG     // Form slug (pelatihan)
-HRISSQ_SS_URL        // StarSender API URL
-HRISSQ_SS_KEY        // StarSender API key
-HRISSQ_SS_HC         // HCM phone number
-HRISSQ_LOG_FILE      // Log file path
+HCISYSQ_VER           // Plugin version
+HCISYSQ_DIR           // Plugin directory path
+HCISYSQ_URL           // Plugin URL
+HCISYSQ_LOGIN_SLUG    // Login page slug (masuk)
+HCISYSQ_DASHBOARD_SLUG // Dashboard slug (dashboard)
+HCISYSQ_FORM_SLUG     // Form slug (pelatihan)
+HCISYSQ_SS_URL        // StarSender API URL
+HCISYSQ_SS_KEY        // StarSender API key
+HCISYSQ_SS_HC         // HCM phone number
+HCISYSQ_LOG_FILE      // Log file path
 ```
 
 ## Flow Diagrams
@@ -215,7 +215,7 @@ HRISSQ_LOG_FILE      // Log file path
 ```
 User accesses /masuk
   → Enter NIP + Password
-  → AJAX to hrissq_login
+  → AJAX to hcisysq_login
   → Auth::login() validates
   → Set session (cookie + transient)
   → Redirect to /dashboard
@@ -224,7 +224,7 @@ User accesses /masuk
 ### Logout Flow
 ```
 User clicks "Keluar"
-  → AJAX to hrissq_logout
+  → AJAX to hcisysq_logout
   → Auth::logout() clears session
   → Redirect to /masuk
 
@@ -239,24 +239,24 @@ User idle 15 minutes
 ### Import Flow
 ```
 WP-Cron (daily)
-  → hrissq_profiles_cron
+  → hcisysq_profiles_cron
     → Fetch CSV
     → Parse rows
-    → REPLACE into hrissq_profiles
+    → REPLACE into hcisysq_profiles
 
-  → hrissq_users_cron
+  → hcisysq_users_cron
     → Fetch Sheet via export?format=csv
     → Parse rows
     → Hash passwords if needed
-    → REPLACE into hrissq_users
+    → REPLACE into hcisysq_users
 ```
 
 ### Training Submit Flow
 ```
 User fills form
-  → AJAX to hrissq_submit_training
+  → AJAX to hcisysq_submit_training
   → Validate + Upload file
-  → INSERT into hrissq_trainings
+  → INSERT into hcisysq_trainings
   → POST to Google Apps Script
   → Apps Script appends to Sheet
   → Return success

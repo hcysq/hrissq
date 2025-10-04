@@ -1,11 +1,11 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
 class Profiles {
 
-  const OPT_CSV_URL = 'hrissq_profiles_csv_url';
+  const OPT_CSV_URL = 'hcisysq_profiles_csv_url';
 
   /** Simpan / Ambil URL CSV publik */
   public static function set_csv_url($url){
@@ -75,7 +75,7 @@ class Profiles {
     }
 
     global $wpdb;
-    $t = $wpdb->prefix.'hrissq_profiles';
+    $t = $wpdb->prefix.'hcisysq_profiles';
     $inserted = 0; $updated = 0; $rownum = 1;
 
     while (($row = fgetcsv($fh)) !== false) {
@@ -119,7 +119,7 @@ class Profiles {
 
   /** Ambil profil ringkas berdasarkan NIP */
   public static function get_by_nip($nip){
-    global $wpdb; $t = $wpdb->prefix.'hrissq_profiles';
+    global $wpdb; $t = $wpdb->prefix.'hcisysq_profiles';
     return $wpdb->get_row($wpdb->prepare("SELECT * FROM $t WHERE nip=%s", $nip));
   }
 }

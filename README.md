@@ -110,8 +110,8 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 ### Login
 1. User mengakses halaman `/masuk`
 2. Input NIP + Password (default: No HP format 62xxx)
-3. Plugin memverifikasi ke tabel `hrissq_users`
-4. Jika berhasil, session dibuat dengan cookie `hrissq_token` (expired 1 jam)
+3. Plugin memverifikasi ke tabel `hcisysq_users`
+4. Jika berhasil, session dibuat dengan cookie `hcisysq_token` (expired 1 jam)
 5. Redirect ke `/dashboard`
 
 ### Logout
@@ -126,39 +126,39 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 
 ## Database Tables
 
-### `wp_hrissq_users`
+### `wp_hcisysq_users`
 Tabel autentikasi user (di-sync dari Google Sheet)
 
-### `wp_hrissq_profiles`
+### `wp_hcisysq_profiles`
 Tabel profil pegawai lengkap (di-sync dari CSV)
 
-### `wp_hrissq_trainings`
+### `wp_hcisysq_trainings`
 Tabel rekam data pelatihan yang diinput pegawai
 
 ## Shortcodes
 
 ```
-[hrissq_login]     - Halaman login
-[hrissq_dashboard] - Dashboard pegawai
-[hrissq_form]      - Form input pelatihan
+[hcisysq_login]     - Halaman login
+[hcisysq_dashboard] - Dashboard pegawai
+[hcisysq_form]      - Form input pelatihan
 ```
 
 ## Cron Jobs
 
 Plugin menggunakan WP-Cron untuk sinkronisasi otomatis:
 
-- `hrissq_profiles_cron` - Import profil pegawai (daily)
-- `hrissq_users_cron` - Import data users (daily)
+- `hcisysq_profiles_cron` - Import profil pegawai (daily)
+- `hcisysq_users_cron` - Import data users (daily)
 
 ## StarSender Integration
 
 Untuk fitur "Lupa Password", plugin mengirim pesan ke Admin HCM via WhatsApp menggunakan StarSender API.
 
-**Konfigurasi** (di `hrissq.php`):
+**Konfigurasi** (di `hcisysq.php`):
 ```php
-define('HRISSQ_SS_URL', 'https://starsender.online/api/sendText');
-define('HRISSQ_SS_KEY', 'YOUR_API_KEY');
-define('HRISSQ_SS_HC',  '6285175201627'); // nomor admin HCM
+define('HCISYSQ_SS_URL', 'https://starsender.online/api/sendText');
+define('HCISYSQ_SS_KEY', 'YOUR_API_KEY');
+define('HCISYSQ_SS_HC',  '6285175201627'); // nomor admin HCM
 ```
 
 ## Changelog
@@ -168,7 +168,7 @@ define('HRISSQ_SS_HC',  '6285175201627'); // nomor admin HCM
 - Added Google Sheets integration (Users, Profiles, Training)
 - Added auto-logout after 15 minutes idle
 - Improved form UI/UX
-- Fixed table structure consistency (hrissq_users vs hrissq_employees)
+- Fixed table structure consistency (hcisysq_users vs hcisysq_employees)
 
 ## Support
 

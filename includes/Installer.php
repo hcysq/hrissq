@@ -1,5 +1,5 @@
 <?php
-namespace HRISSQ;
+namespace HCISYSQ;
 
 if (!defined('ABSPATH')) exit;
 
@@ -8,9 +8,9 @@ class Installer {
     global $wpdb;
     $charset = $wpdb->get_charset_collate();
 
-    $t_users = $wpdb->prefix.'hrissq_users';
-    $t_tr    = $wpdb->prefix.'hrissq_trainings';
-    $t_pf    = $wpdb->prefix.'hrissq_profiles';
+    $t_users = $wpdb->prefix.'hcisysq_users';
+    $t_tr    = $wpdb->prefix.'hcisysq_trainings';
+    $t_pf    = $wpdb->prefix.'hcisysq_profiles';
 
     // Tabel users (untuk autentikasi)
     $sql1 = "CREATE TABLE IF NOT EXISTS $t_users (
@@ -65,11 +65,11 @@ class Installer {
     dbDelta($sql3);
 
     // Jadwalkan import harian (kalau belum)
-    if (!wp_next_scheduled('hrissq_profiles_cron')) {
-      wp_schedule_event(time() + 600, 'daily', 'hrissq_profiles_cron');
+    if (!wp_next_scheduled('hcisysq_profiles_cron')) {
+      wp_schedule_event(time() + 600, 'daily', 'hcisysq_profiles_cron');
     }
-    if (!wp_next_scheduled('hrissq_users_cron')) {
-      wp_schedule_event(time() + 600, 'daily', 'hrissq_users_cron');
+    if (!wp_next_scheduled('hcisysq_users_cron')) {
+      wp_schedule_event(time() + 600, 'daily', 'hcisysq_users_cron');
     }
   }
 }

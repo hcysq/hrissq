@@ -2,7 +2,7 @@
 
 ## Ringkasan
 
-Plugin HRISSQ menggunakan 3 Google Sheets untuk berbagai keperluan:
+Plugin HCISYSQ menggunakan 3 Google Sheets untuk berbagai keperluan:
 
 1. **Profil Pegawai** (CSV) - Data profil lengkap pegawai
 2. **Data Users** (Sheet) - Data autentikasi user
@@ -129,7 +129,7 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 1. Klik **Deploy → New deployment**
 2. Settings:
    - Click icon ⚙️ → Select type: **Web app**
-   - Description: `HRISSQ Training Receiver`
+   - Description: `HCISYSQ Training Receiver`
    - Execute as: **Me** (email Anda)
    - Who has access: **Anyone**
 3. Klik **Deploy**
@@ -192,8 +192,8 @@ Plugin menggunakan WP-Cron untuk auto-sync harian:
 
 Jika ingin trigger manual sync via WP-CLI:
 ```bash
-wp cron event run hrissq_profiles_cron
-wp cron event run hrissq_users_cron
+wp cron event run hcisysq_profiles_cron
+wp cron event run hcisysq_users_cron
 ```
 
 ---
@@ -215,7 +215,7 @@ wp cron event run hrissq_users_cron
 - Pastikan Web App URL benar
 - Cek Apps Script sudah di-deploy dengan akses "Anyone"
 - Test function `testPost()` di Apps Script
-- Cek log error di wp-content/hrissq.log
+- Cek log error di wp-content/hcisysq.log
 
 ### WP-Cron Tidak Jalan
 - Pastikan WP-Cron aktif (tidak disabled di wp-config.php)
@@ -239,7 +239,7 @@ wp cron event run hrissq_users_cron
 
 Jika ada masalah, cek file log di:
 ```
-wp-content/hrissq.log
+wp-content/hcisysq.log
 ```
 
 Atau hubungi developer.

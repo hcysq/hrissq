@@ -1,9 +1,9 @@
-/* HRISSQ front scripts */
+/* HCISYSQ front scripts */
 (function () {
   // --- util AJAX ke admin-ajax.php ---
   function ajax(action, body = {}, withFile = false) {
-    const url = (window.HRISSQ && HRISSQ.ajax) ? HRISSQ.ajax : '/wp-admin/admin-ajax.php';
-    const nonce = (window.HRISSQ && HRISSQ.nonce) ? HRISSQ.nonce : '';
+    const url = (window.HCISYSQ && HCISYSQ.ajax) ? HCISYSQ.ajax : '/wp-admin/admin-ajax.php';
+    const nonce = (window.HCISYSQ && HCISYSQ.nonce) ? HCISYSQ.nonce : '';
 
     if (withFile) {
       const fd = new FormData();
@@ -45,12 +45,12 @@
 
   // --- LOGIN PAGE ---
   function bootLogin() {
-    const form = document.getElementById('hrissq-login-form');
+    const form = document.getElementById('hcisysq-login-form');
     if (!form) return;
 
     // toggle eye
-    const eye = document.getElementById('hrissq-eye');
-    const pw = document.getElementById('hrissq-pw');
+    const eye = document.getElementById('hcisysq-eye');
+    const pw = document.getElementById('hcisysq-pw');
     if (eye && pw) {
       eye.addEventListener('click', () => {
         pw.type = pw.type === 'password' ? 'text' : 'password';
@@ -69,9 +69,9 @@
       const pwv = (form.pw.value || '').trim();
       if (!nip || !pwv) { msg.textContent = 'Akun & Pasword wajib diisi.'; return; }
 
-      console.log('Submitting login:', { nip, ajax_url: (window.HRISSQ && HRISSQ.ajax) });
+      console.log('Submitting login:', { nip, ajax_url: (window.HCISYSQ && HCISYSQ.ajax) });
 
-      ajax('hrissq_login', { nip, pw: pwv })
+      ajax('hcisysq_login', { nip, pw: pwv })
         .then(res => {
           console.log('Login response:', res);
           if (!res || !res.ok) {
@@ -79,7 +79,7 @@
             return;
           }
           // server sudah mengirim res.redirect → pakai itu
-          const dashSlug = (window.HRISSQ && HRISSQ.dashboardSlug) ? HRISSQ.dashboardSlug : 'dashboard';
+          const dashSlug = (window.HCISYSQ && HCISYSQ.dashboardSlug) ? HCISYSQ.dashboardSlug : 'dashboard';
           const redirectUrl = res.redirect || ('/' + dashSlug.replace(/^\/+/, '') + '/');
           console.log('Redirecting to:', redirectUrl);
           window.location.href = redirectUrl;
@@ -91,13 +91,13 @@
     });
 
     // Forgot password modal
-    const forgotBtn = document.getElementById('hrissq-forgot');
-    const backdrop = document.getElementById('hrissq-modal');
-    const cancelBtn = document.getElementById('hrissq-cancel');
-    const closeBtn = document.getElementById('hrissq-close-modal');
-    const sendBtn = document.getElementById('hrissq-send');
-    const npInput = document.getElementById('hrissq-nip-forgot');
-    const fMsg = document.getElementById('hrissq-forgot-msg');
+    const forgotBtn = document.getElementById('hcisysq-forgot');
+    const backdrop = document.getElementById('hcisysq-modal');
+    const cancelBtn = document.getElementById('hcisysq-cancel');
+    const closeBtn = document.getElementById('hcisysq-close-modal');
+    const sendBtn = document.getElementById('hcisysq-send');
+    const npInput = document.getElementById('hcisysq-nip-forgot');
+    const fMsg = document.getElementById('hcisysq-forgot-msg');
 
     if (forgotBtn && backdrop) {
       const closeModal = () => {
@@ -117,8 +117,8 @@
         if (!nip) { fMsg.textContent = 'Akun wajib diisi.'; return; }
         fMsg.textContent = 'Mengirim permintaan…';
 
-        // NOTE: pastikan endpoint hrissq_forgot sudah ada di Api.php
-        ajax('hrissq_forgot', { nip })
+        // NOTE: pastikan endpoint hcisysq_forgot sudah ada di Api.php
+        ajax('hcisysq_forgot', { nip })
           .then(res => {
             if (res && res.ok) {
               fMsg.className = 'modal-msg ok';
@@ -139,11 +139,11 @@
 
   // --- DASHBOARD: tombol Keluar ---
   function bootLogoutButton() {
-    const buttons = document.querySelectorAll('#hrissq-logout');
+    const buttons = document.querySelectorAll('#hcisysq-logout');
     if (!buttons.length) return;
 
     const redirectToLogin = () => {
-      const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+      const slug = (window.HCISYSQ && HCISYSQ.loginSlug) ? HCISYSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
       window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
     };
 
@@ -154,7 +154,7 @@
         const old = btn.textContent;
         btn.textContent = 'Keluar…';
 
-        ajax('hrissq_logout', {})
+        ajax('hcisysq_logout', {})
           .then(redirectToLogin)
           .catch(redirectToLogin)
           .finally(() => {
@@ -167,13 +167,13 @@
 
   // --- DASHBOARD: sidebar toggle ---
   function bootSidebarToggle() {
-    const layout = document.getElementById('hrissq-dashboard');
-    const sidebar = document.getElementById('hrissq-sidebar');
-    const toggle = document.getElementById('hrissq-sidebar-toggle');
+    const layout = document.getElementById('hcisysq-dashboard');
+    const sidebar = document.getElementById('hcisysq-sidebar');
+    const toggle = document.getElementById('hcisysq-sidebar-toggle');
     if (!layout || !sidebar || !toggle) return;
 
-    const overlay = document.getElementById('hrissq-sidebar-overlay');
-    const closeBtn = document.getElementById('hrissq-sidebar-close');
+    const overlay = document.getElementById('hcisysq-sidebar-overlay');
+    const closeBtn = document.getElementById('hcisysq-sidebar-close');
     const mq = window.matchMedia('(max-width: 960px)');
 
     function isMobile() {
@@ -300,8 +300,8 @@
     }
 
     function doLogout() {
-      ajax('hrissq_logout', {}).finally(() => {
-        const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+      ajax('hcisysq_logout', {}).finally(() => {
+        const slug = (window.HCISYSQ && HCISYSQ.loginSlug) ? HCISYSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
         window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
       });
     }
@@ -319,7 +319,7 @@
 
   // --- TRAINING FORM ---
   function bootTrainingForm() {
-    const form = document.getElementById('hrissq-training-form');
+    const form = document.getElementById('hcisysq-training-form');
     if (!form) return;
 
     form.addEventListener('submit', (e) => {
@@ -340,10 +340,10 @@
       msgEl.textContent = '';
 
       const formData = new FormData(form);
-      formData.append('action', 'hrissq_submit_training');
-      formData.append('_nonce', (window.HRISSQ && HRISSQ.nonce) ? HRISSQ.nonce : '');
+      formData.append('action', 'hcisysq_submit_training');
+      formData.append('_nonce', (window.HCISYSQ && HCISYSQ.nonce) ? HCISYSQ.nonce : '');
 
-      const url = (window.HRISSQ && HRISSQ.ajax) ? HRISSQ.ajax : '/wp-admin/admin-ajax.php';
+      const url = (window.HCISYSQ && HCISYSQ.ajax) ? HCISYSQ.ajax : '/wp-admin/admin-ajax.php';
 
       fetch(url, {
         method: 'POST',
@@ -357,7 +357,7 @@
             msgEl.textContent = 'Data berhasil disimpan!';
             form.reset();
             setTimeout(() => {
-              const dashSlug = (window.HRISSQ && HRISSQ.dashboardSlug) ? HRISSQ.dashboardSlug : 'dashboard';
+              const dashSlug = (window.HCISYSQ && HCISYSQ.dashboardSlug) ? HCISYSQ.dashboardSlug : 'dashboard';
               window.location.href = '/' + dashSlug.replace(/^\/+/, '') + '/';
             }, 1500);
           } else {
@@ -365,7 +365,7 @@
             if (res && res.msg === 'Unauthorized') {
               msgEl.textContent = 'Sesi Anda berakhir. Silakan login kembali.';
               setTimeout(() => {
-                const slug = (window.HRISSQ && HRISSQ.loginSlug) ? HRISSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
+                const slug = (window.HCISYSQ && HCISYSQ.loginSlug) ? HCISYSQ.loginSlug.replace(/^\/+/, '') : 'masuk';
                 window.location.href = '/' + slug.replace(/\/+$/, '') + '/';
               }, 1200);
             } else {
