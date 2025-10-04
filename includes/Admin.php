@@ -6,8 +6,8 @@ if (!defined('ABSPATH')) exit;
 class Admin {
   public static function menu(){
     add_management_page(
-      'HRISSQ Settings',
-      'HRISSQ Settings',
+      'HCIS.YSQ Settings',
+      'HCIS.YSQ Settings',
       'manage_options',
       'hrissq-settings',
       [__CLASS__,'render']
@@ -78,7 +78,7 @@ class Admin {
     $training_webapp_url = esc_url(Trainings::get_webapp_url());
     ?>
     <div class="wrap">
-      <h1>HRISSQ • Settings & Import</h1>
+      <h1>HCIS.YSQ • Settings & Import</h1>
       <?php if ($msg): ?>
         <div class="notice notice-info"><p><?= $msg ?></p></div>
       <?php endif; ?>

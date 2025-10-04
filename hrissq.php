@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: HRIS SQ (hrissq)
+ * Plugin Name: HCIS YSQ (hcis.ysq)
  * Description: Login NIP+HP, Dashboard Pegawai, Form Pelatihan dengan Google Sheets Integration + SSO ke Google Apps Script.
  * Version: 1.1.0
  * Author: samijaya
@@ -16,7 +16,7 @@ if (!defined('HRISSQ_LOG_FILE')) {
 }
 if (!function_exists('hrissq_log')) {
   function hrissq_log($data) {
-    $msg = '[HRISSQ ' . date('Y-m-d H:i:s') . '] ';
+    $msg = '[HCIS.YSQ ' . date('Y-m-d H:i:s') . '] ';
     $msg .= is_scalar($data) ? $data : print_r($data, true);
     $msg .= PHP_EOL;
     @error_log($msg, 3, HRISSQ_LOG_FILE); // tulis ke wp-content/hrissq.log
@@ -34,7 +34,7 @@ register_shutdown_function(function(){
     hrissq_log("FATAL {$e['message']} @ {$e['file']}:{$e['line']}");
   }
 });
-hrissq_log('hrissq plugin boot...');
+hrissq_log('hcis.ysq plugin boot...');
 
 /* =======================================================
  *  Konstanta plugin

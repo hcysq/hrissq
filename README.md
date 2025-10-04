@@ -1,4 +1,4 @@
-# HRIS SQ Plugin - WordPress
+# HCIS.YSQ Plugin - WordPress
 
 Plugin HRIS (Human Resource Information System) untuk sistem kepegawaian dengan integrasi Google Sheets.
 
@@ -28,7 +28,7 @@ Plugin HRIS (Human Resource Information System) untuk sistem kepegawaian dengan 
 
 1. Upload folder plugin ke `wp-content/plugins/`
 2. Aktifkan plugin melalui WordPress Admin
-3. Buka **Tools → HRISSQ Settings** untuk konfigurasi
+3. Buka **Tools → HCIS.YSQ Settings** untuk konfigurasi
 
 ## Konfigurasi Google Sheets
 
@@ -70,7 +70,7 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
 
 **Cara konfigurasi:**
 1. Pastikan Google Sheet dapat diakses (Share → Anyone with link can view)
-2. Masukkan Sheet ID dan Tab Name di HRISSQ Settings
+2. Masukkan Sheet ID dan Tab Name di HCIS.YSQ Settings
 3. Klik "Import Sekarang" untuk sinkronisasi manual
 4. Import otomatis akan berjalan setiap hari via WP-Cron
 
@@ -90,7 +90,7 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vTlR2VUOcQfXRjZN4fNC-o4CvPTgd-Zl
    - Execute as: **Me**
    - Who has access: **Anyone**
    - Copy URL deployment
-5. Paste URL ke **HRISSQ Settings → Training → Web App URL**
+5. Paste URL ke **HCIS.YSQ Settings → Training → Web App URL**
 
 **Struktur kolom yang akan dibuat otomatis:**
 - Timestamp
